@@ -16,11 +16,32 @@ import os
 # --- Constants ---
 SPRITE_SCALING_PLAYER = 0.5
 SPRITE_SCALING_COIN = 0.2
-COIN_COUNT = 50
+COIN_COUNT = 100
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
+
+RATE = 1
+
+
+class Coin(arcade.Sprite):
+    def __init__(self, filename: str = None, scale: float = 1):
+        super().__init__(filename, scale)
+        self.rate = RATE
+
+    def update(self):
+        self.center_y -= self.rate
+
+        # See if we went off-screen
+        if self.top < 0:
+            # Reset the coin to a random spot above the screen
+            self.center_y = random.randrange(SCREEN_HEIGHT + 20,
+                                            SCREEN_HEIGHT + 100)
+            self.center_x = random.randrange(SCREEN_WIDTH)
+
+    def set_rate(self, rate: int):
+        self.rate = rate
 
 
 class MyGame(arcade.Window):
@@ -45,6 +66,7 @@ class MyGame(arcade.Window):
         # Set up the player info
         self.player_sprite = None
         self.score = 0
+        self.coin_count = COIN_COUNT
 
         # Don't show the mouse cursor
         self.set_mouse_visible(False)
@@ -63,17 +85,19 @@ class MyGame(arcade.Window):
 
         # Set up the player
         # Character image from kenney.nl
-        self.player_sprite = arcade.Sprite("images/character.png", SPRITE_SCALING_PLAYER)
+        self.player_sprite = arcade.Sprite(
+            "images/character.png", SPRITE_SCALING_PLAYER
+        )
         self.player_sprite.center_x = 50
         self.player_sprite.center_y = 50
         self.player_list.append(self.player_sprite)
 
         # Create the coins
-        for _ in range(COIN_COUNT):
+        for _ in range(self.coin_count):
 
             # Create the coin instance
             # Coin image from kenney.nl
-            coin = arcade.Sprite("images/coin_01.png", SPRITE_SCALING_COIN)
+            coin = Coin("images/coin_01.png", SPRITE_SCALING_COIN)
 
             # Position the coin
             coin.center_x = random.randrange(SCREEN_WIDTH)
@@ -89,7 +113,7 @@ class MyGame(arcade.Window):
         self.player_list.draw()
 
         # Put the text on the screen.
-        output = f"Score: {self.score}"
+        output = f"Score: {self.score} / {self.coin_count}"
         arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
 
     def on_mouse_motion(self, x, y, dx, dy):
@@ -107,12 +131,47 @@ class MyGame(arcade.Window):
         self.coin_list.update()
 
         # Generate a list of all sprites that collided with the player.
-        coins_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
+        coins_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.coin_list
+        )
 
         # Loop through each colliding sprite, remove it, and add to the score.
         for coin in coins_hit_list:
             coin.kill()
             self.score += 1
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        if symbol == arcade.key.TAB:
+            self.setup()
+        elif symbol == arcade.key.ESCAPE:
+            arcade.close_window()
+        elif symbol == arcade.key.KEY_1:
+            self.coin_count = 100
+            self.setup()
+        elif symbol == arcade.key.KEY_2:
+            self.coin_count = 200
+            self.setup()
+        elif symbol == arcade.key.KEY_3:
+            self.coin_count = 300
+            self.setup()
+        elif symbol == arcade.key.KEY_4:
+            self.coin_count = 400
+            self.setup()
+        elif symbol == arcade.key.KEY_5:
+            self.coin_count = 500
+            self.setup()
+        elif symbol == arcade.key.KEY_6:
+            self.coin_count = 600
+            self.setup()
+        elif symbol == arcade.key.KEY_7:
+            self.coin_count = 700
+            self.setup()
+        elif symbol == arcade.key.KEY_8:
+            self.coin_count = 800
+            self.setup()
+        elif symbol == arcade.key.KEY_9:
+            self.coin_count = 900
+            self.setup()
 
 
 def main():
