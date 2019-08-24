@@ -16,19 +16,19 @@ import os
 # --- Constants ---
 SPRITE_SCALING_PLAYER = 0.5
 SPRITE_SCALING_COIN = 0.2
-COIN_COUNT = 100
+COIN_COUNT = 10
+COIN_MULTIPLES = 10
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins Example"
 
-RATE = 1
-
+START_RATE = 1
 
 class Coin(arcade.Sprite):
-    def __init__(self, filename: str = None, scale: float = 1):
+    def __init__(self, filename: str = None, scale: float = 1, rate: int = START_RATE):
         super().__init__(filename, scale)
-        self.rate = RATE
+        self.rate = rate
 
     def update(self):
         self.center_y -= self.rate
@@ -39,10 +39,7 @@ class Coin(arcade.Sprite):
             self.center_y = random.randrange(SCREEN_HEIGHT + 20,
                                             SCREEN_HEIGHT + 100)
             self.center_x = random.randrange(SCREEN_WIDTH)
-
-    def set_rate(self, rate: int):
-        self.rate = rate
-
+            self.rate += 1
 
 class MyGame(arcade.Window):
     """ Our custom Window Class"""
@@ -67,6 +64,7 @@ class MyGame(arcade.Window):
         self.player_sprite = None
         self.score = 0
         self.coin_count = COIN_COUNT
+        self.rate = START_RATE
 
         # Don't show the mouse cursor
         self.set_mouse_visible(False)
@@ -97,7 +95,7 @@ class MyGame(arcade.Window):
 
             # Create the coin instance
             # Coin image from kenney.nl
-            coin = Coin("images/coin_01.png", SPRITE_SCALING_COIN)
+            coin = Coin("images/coin_01.png", SPRITE_SCALING_COIN, rate=self.rate)
 
             # Position the coin
             coin.center_x = random.randrange(SCREEN_WIDTH)
@@ -140,37 +138,42 @@ class MyGame(arcade.Window):
             coin.kill()
             self.score += 1
 
+        if self.score >= self.coin_count:
+            self.coin_count += COIN_MULTIPLES
+            self.rate += 1
+            self.setup()
+
     def on_key_press(self, symbol: int, modifiers: int):
         if symbol == arcade.key.TAB:
             self.setup()
         elif symbol == arcade.key.ESCAPE:
             arcade.close_window()
         elif symbol == arcade.key.KEY_1:
-            self.coin_count = 100
+            self.coin_count = 1 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_2:
-            self.coin_count = 200
+            self.coin_count = 2 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_3:
-            self.coin_count = 300
+            self.coin_count = 3 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_4:
-            self.coin_count = 400
+            self.coin_count = 4 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_5:
-            self.coin_count = 500
+            self.coin_count = 5 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_6:
-            self.coin_count = 600
+            self.coin_count = 6 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_7:
-            self.coin_count = 700
+            self.coin_count = 7 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_8:
-            self.coin_count = 800
+            self.coin_count = 8 * COIN_MULTIPLES
             self.setup()
         elif symbol == arcade.key.KEY_9:
-            self.coin_count = 900
+            self.coin_count = 9 * COIN_MULTIPLES
             self.setup()
 
 
