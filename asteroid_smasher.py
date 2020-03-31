@@ -144,7 +144,7 @@ class AsteroidSprite(arcade.Sprite):
 
     def update(self):
         """ Move the asteroid around. """
-        if self.splitting > 0:
+        if self.splitting > NOT_SPLITTING:
             self.splitting -= 1
 
         super().update()
