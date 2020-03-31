@@ -9,12 +9,13 @@ Artwork from http://kenney.nl
 If Python and Arcade are installed, this example can be run from the command line with:
 python -m arcade.examples.asteroid_smasher
 
-TODO: Make asteroids crash
-TODO: Prevent mouse from creating too many asteroids
-TODO: Prevent mouse from creating asteroids too close to player
-TODO: If player wins the level, tell them they've won
-TODO: Make different prize levels
-TODO: Write instucructions
+TODO: [X] Make asteroids crash
+TODO: [ ] Prevent mouse from creating too many asteroids
+TODO: [ ] Prevent mouse from creating asteroids too close to player
+TODO: [ ] If player wins the level, tell them they've won
+TODO: [ ] Make different prize levels
+TODO: [ ] When Game Over, don't show the spaceship
+TODO: [ ] Write instucructions
 """
 import random
 import math
@@ -35,6 +36,8 @@ RIGHT_LIMIT = SCREEN_WIDTH + OFFSCREEN_SPACE
 BOTTOM_LIMIT = -OFFSCREEN_SPACE
 TOP_LIMIT = SCREEN_HEIGHT + OFFSCREEN_SPACE
 SPACESHIPS = ["playerShip1_orange","playerShip2_orange","playerShip3_orange","playerShip1_green"]
+NOT_SPLITTING = 0
+SPLITTING = 50
 
 
 class TurningSprite(arcade.Sprite):
@@ -137,9 +140,13 @@ class AsteroidSprite(arcade.Sprite):
     def __init__(self, image_file_name, scale):
         super().__init__(image_file_name, scale=scale)
         self.size = 0
+        self.splitting = SPLITTING
 
     def update(self):
         """ Move the asteroid around. """
+        if self.splitting > NOT_SPLITTING:
+            self.splitting -= 1
+
         super().update()
         if self.center_x < LEFT_LIMIT:
             self.center_x = RIGHT_LIMIT
@@ -363,6 +370,8 @@ class MyGame(arcade.Window):
                 enemy_sprite.change_angle = (random.random() - 0.5) * 2
                 enemy_sprite.size = 3
 
+                enemy_sprite.splitting = SPLITTING
+
                 self.all_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
                 self.hit_sound1.play()
@@ -384,6 +393,8 @@ class MyGame(arcade.Window):
 
                 enemy_sprite.change_angle = (random.random() - 0.5) * 2
                 enemy_sprite.size = 2
+
+                enemy_sprite.splitting = SPLITTING
 
                 self.all_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
@@ -407,6 +418,8 @@ class MyGame(arcade.Window):
                 enemy_sprite.change_angle = (random.random() - 0.5) * 2
                 enemy_sprite.size = 1
 
+                enemy_sprite.splitting = SPLITTING
+                
                 self.all_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
                 self.hit_sound3.play()
@@ -414,15 +427,8 @@ class MyGame(arcade.Window):
         elif asteroid.size == 1:
             self.hit_sound4.play()
 
-    def on_update(self, x):
-        """ Move everything """
-
-        if not self.paused:
-            self.frame_count += 1
-
-            self.all_sprites_list.update()
-
-            for bullet in self.bullet_list:
+    def process_bullets_colliding_with_asteroids(self):
+        for bullet in self.bullet_list:
                 asteroids_plain = arcade.check_for_collision_with_list(bullet, self.asteroid_list)
                 asteroids_spatial = arcade.check_for_collision_with_list(bullet, self.asteroid_list)
                 if len(asteroids_plain) != len(asteroids_spatial):
@@ -434,6 +440,37 @@ class MyGame(arcade.Window):
                     self.split_asteroid(cast(AsteroidSprite, asteroid))  # expected AsteroidSprite, got Sprite instead
                     asteroid.remove_from_sprite_lists()
                     bullet.remove_from_sprite_lists()
+    
+    def process_asteroids_colliding_with_asteroids(self):
+        asteroids_to_split : AsteroidSprite = []
+        for asteroid in self.asteroid_list:
+            collided = False
+            asteroids_colliding = arcade.check_for_collision_with_list(asteroid, self.asteroid_list)
+            
+            for collision in asteroids_colliding:
+                if collision != asteroid and collision.splitting == NOT_SPLITTING and asteroid.splitting == NOT_SPLITTING:
+                    asteroids_to_split.append(collision)
+                    asteroids_to_split.append(asteroid)
+                    collided = True
+                    break
+            
+            if collided:
+                break
+        
+        for asteroid in asteroids_to_split:
+            self.split_asteroid(cast(AsteroidSprite, asteroid))  # expected AsteroidSprite, got Sprite instead
+            asteroid.remove_from_sprite_lists()
+    
+    def on_update(self, x):
+        """ Move everything """
+
+        if not self.paused:
+            self.frame_count += 1
+
+            self.all_sprites_list.update()
+
+            self.process_bullets_colliding_with_asteroids()
+            self.process_asteroids_colliding_with_asteroids()
 
             if not self.game_over:
                 if not self.player_sprite.respawning:
