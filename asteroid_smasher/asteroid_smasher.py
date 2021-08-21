@@ -9,13 +9,23 @@ Artwork from http://kenney.nl
 If Python and Arcade are installed, this example can be run from the command line with:
 python -m arcade.examples.asteroid_smasher
 
-TODO: [X] Make asteroids crash
-TODO: [ ] Prevent mouse from creating too many asteroids
-TODO: [ ] Prevent mouse from creating asteroids too close to player
-TODO: [ ] If player wins the level, tell them they've won
-TODO: [ ] Make different prize levels
-TODO: [ ] When Game Over, don't show the spaceship
-TODO: [ ] Write instucructions
+TODO:
+[X] Make asteroids crash
+[X] Keyboard shortcuts on screen
+[ ] Prevent mouse from creating too many asteroids
+[ ] Prevent mouse from creating asteroids too close to player
+[ ] If player wins the level, tell them they've won
+[ ] Make different prize levels
+[ ] Prizes can give different spaceships
+[ ] When Game Over, don't show the spaceship
+[ ] Add instructions
+[ ] Bullets can wrap around
+[ ] Bullets can wrap only once
+[ ] Bullets can wrap a random number of times
+[ ] Bullets can kill us!
+[ ] Split into different files
+[ ] Ask "Do you want to restart?" when Enter is pressed
+[ ] Make it more obvious when you're not ready to shoot
 """
 import random
 import math
@@ -284,6 +294,10 @@ class MyGame(arcade.Window):
 
         output = f"Asteroid Count: {len(self.asteroid_list)}"
         arcade.draw_text(output, 10, 50, arcade.color.WHITE, 13)
+
+        arcade.draw_text(
+            "Keys: Esc=Exit, Enter=New Game, Pause=Pause/Unpause, Space=Shoot, Left/Right=Turn, Up/Down=Move, MouseClick=New Asteroid",
+            400, 5, arcade.color.AERO_BLUE, 13)
 
         if self.game_over:
             arcade.draw_text("GAME OVER!", self.width / 2, self.height / 2,
