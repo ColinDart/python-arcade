@@ -12,20 +12,24 @@ python -m arcade.examples.asteroid_smasher
 TODO:
 [X] Make asteroids crash
 [X] Keyboard shortcuts on screen
+[ ] If player wins the level, tell them they've won
+[ ] When Game Over, don't show the spaceship
+[ ] Ask "Do you want to restart?" when Enter is pressed
 [ ] Prevent mouse from creating too many asteroids
 [ ] Prevent mouse from creating asteroids too close to player
-[ ] If player wins the level, tell them they've won
+[ ] Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
+[ ] When you shoot, blue lazar bar reduces, when you're not shooting it increases - if you run out, lazer overheats, have to wait for grey bar again
+[ ] Bullets can wrap around, but only once
+[ ] Our own bullets can kill us!
+[ ] Bullets can wrap a random number of times
+[ ] Randomly (not too often) a new asteroid can appear (but only if game is not over)
+[ ] Add a leaderboard to track best scores
+[ ] Tell the player if they get a score on the leaderboard (they can enter a name when they get on)
+[ ] 2 players can play at the same time
 [ ] Make different prize levels
 [ ] Prizes can give different spaceships
-[ ] When Game Over, don't show the spaceship
-[ ] Add instructions
-[ ] Bullets can wrap around
-[ ] Bullets can wrap only once
-[ ] Bullets can wrap a random number of times
-[ ] Bullets can kill us!
 [ ] Split into different files
-[ ] Ask "Do you want to restart?" when Enter is pressed
-[ ] Make it more obvious when you're not ready to shoot
+[ ] Add instructions
 """
 import random
 import math
