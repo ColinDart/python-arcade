@@ -12,24 +12,29 @@ python -m arcade.examples.asteroid_smasher
 TODO:
 [X] Make asteroids crash
 [X] Keyboard shortcuts on screen
-[ ] If player wins the level, tell them they've won
-[ ] When Game Over, don't show the spaceship
-[ ] Ask "Do you want to restart?" when Enter is pressed
-[ ] Prevent mouse from creating too many asteroids
-[ ] Prevent mouse from creating asteroids too close to player
-[ ] Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
-[ ] When you shoot, blue lazar bar reduces, when you're not shooting it increases - if you run out, lazer overheats, have to wait for grey bar again
-[ ] Bullets can wrap around, but only once
-[ ] Our own bullets can kill us!
-[ ] Bullets can wrap a random number of times
-[ ] Randomly (not too often) a new asteroid can appear (but only if game is not over)
-[ ] Add a leaderboard to track best scores
-[ ] Tell the player if they get a score on the leaderboard (they can enter a name when they get on)
-[ ] 2 players can play at the same time
-[ ] Make different prize levels
-[ ] Prizes can give different spaceships
-[ ] Split into different files
-[ ] Add instructions
+[X] If player wins the level, tell them they've won
+[ ] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
+[ ] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases - if you run out, lazer overheats, have to wait for grey bar again
+[ ] (M) Make at least some of the asteroids change direction towards you
+[ ] (S) When you've lost, don't show the spaceship
+[ ] (S) Ask "Do you want to restart?" when Enter is pressed
+[ ] (S) Prevent mouse from creating too many asteroids
+[ ] (S) Prevent mouse from creating asteroids too close to player
+[ ] (S) Bullets can wrap around, but only once
+[ ] (S) Our own bullets can kill us!
+[ ] (S) When you've won, the spaceship flies off the screen
+[ ] (S) Bullets can wrap a random number of times
+[ ] (S) Randomly (not too often) a new asteroid can appear (but only if game is not over)
+[ ] (L) Tell the player if they get a score on the leaderboard (they can enter a name when they get on)
+[ ] (M) 2 players can play at the same time
+[ ] (S) Can't add asteroids after you've won
+[ ] (L) Make a home screen (leaderboard, play, level selection)
+[ ] (L) Make different prize levels
+[ ] (M) Prizes can give different spaceships
+[ ] (L) Add settings (silent mode, turn on/off features, adjust limits)
+[ ] (S) Make shortcuts right-aligned (automatically fit on the screen)
+[ ] (M) Split into different files
+[ ] (M) Add instructions
 """
 import random
 import math
@@ -281,9 +286,12 @@ class MyGame(arcade.Window):
         for i in range(STARTING_ASTEROID_COUNT):
             self.create_asteroid()
 
+    def number_of_asteroids(self):
+        return len(self.asteroid_list)
+
     def on_draw(self):
         """
-        Render the screen.
+        Render (draw) the screen.
         """
 
         # This command has to happen before we start drawing
@@ -296,12 +304,18 @@ class MyGame(arcade.Window):
         output = f"Score: {self.score}"
         arcade.draw_text(output, 10, 70, arcade.color.WHITE, 13)
 
-        output = f"Asteroid Count: {len(self.asteroid_list)}"
+        output = f"Asteroid Count: {self.number_of_asteroids()}"
         arcade.draw_text(output, 10, 50, arcade.color.WHITE, 13)
 
         arcade.draw_text(
             "Keys: Esc=Exit, Enter=New Game, Pause=Pause/Unpause, Space=Shoot, Left/Right=Turn, Up/Down=Move, MouseClick=New Asteroid",
             400, 5, arcade.color.AERO_BLUE, 13)
+
+        if self.game_won:
+            arcade.draw_text("YOU WON!", self.width / 2, self.height / 2,
+                            arcade.color.YELLOW, 50, align="center", anchor_x="center",
+                            anchor_y="center", rotation=8)
+            return
 
         if self.game_over:
             arcade.draw_text("GAME OVER!", self.width / 2, self.height / 2,
@@ -482,31 +496,47 @@ class MyGame(arcade.Window):
     def on_update(self, x):
         """ Move everything """
 
-        if not self.paused:
-            self.frame_count += 1
+        if self.paused:
+            return
+        
+        self.frame_count += 1
 
-            self.all_sprites_list.update()
+        self.all_sprites_list.update() 
 
-            self.process_bullets_colliding_with_asteroids()
-            self.process_asteroids_colliding_with_asteroids()
+        self.process_bullets_colliding_with_asteroids()
+        self.process_asteroids_colliding_with_asteroids()
 
-            if not self.game_over:
-                if not self.player_sprite.respawning:
-                    asteroids = arcade.check_for_collision_with_list(self.player_sprite, self.asteroid_list)
-                    if len(asteroids) > 0:
-                        if self.lives > 0:
-                            self.lives -= 1
-                            self.current_ship += 1
-                            self.player_sprite.respawn()
-                            self.split_asteroid(cast(AsteroidSprite, asteroids[0]))
-                            asteroids[0].remove_from_sprite_lists()
-                            self.ship_life_list.pop().remove_from_sprite_lists()
-                            print("Crash")
-                        else:
-                            self.game_over = True
-                            self.player_sprite.game_over = True
-                            print("Game over")
-                        
+        if self.game_over:
+            return
+
+        if self.player_sprite.respawning:
+            return
+ 
+        if self.number_of_asteroids() == 0:
+            self.game_won = True
+            self.game_over = True
+            self.player_sprite.game_over = True
+            print("You won!")
+            return
+        
+        asteroids = arcade.check_for_collision_with_list(self.player_sprite, self.asteroid_list)
+
+        if len(asteroids) == 0:
+            return
+
+        if self.lives > 0:
+            self.lives -= 1
+            self.current_ship += 1
+            self.player_sprite.respawn()
+            self.split_asteroid(cast(AsteroidSprite, asteroids[0]))
+            asteroids[0].remove_from_sprite_lists()
+            self.ship_life_list.pop().remove_from_sprite_lists()
+            print("Crash")
+        else:
+            self.game_over = True
+            self.player_sprite.game_over = True
+            print("Game over")
+                    
 
 
 def main():
