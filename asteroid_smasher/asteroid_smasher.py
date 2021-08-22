@@ -13,9 +13,10 @@ TODO:
 [X] Make asteroids crash
 [X] Keyboard shortcuts on screen
 [X] If player wins the level, tell them they've won
-[ ] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
+[X] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
 [ ] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases - if you run out, lazer overheats, have to wait for grey bar again
 [ ] (M) Make at least some of the asteroids change direction towards you
+[0] (S) Upgrade `archade` version
 [ ] (S) When you've lost, don't show the spaceship
 [ ] (S) Ask "Do you want to restart?" when Enter is pressed
 [ ] (S) Prevent mouse from creating too many asteroids
@@ -29,6 +30,7 @@ TODO:
 [ ] (M) 2 players can play at the same time
 [ ] (S) Can't add asteroids after you've won
 [ ] (L) Make a home screen (leaderboard, play, level selection)
+[ ] (L) Package the game for playing sepearately (https://api.arcade.academy/en/latest/tutorials/bundling_with_pyinstaller/index.html)
 [ ] (L) Make different prize levels
 [ ] (M) Prizes can give different spaceships
 [ ] (L) Add settings (silent mode, turn on/off features, adjust limits)
@@ -57,7 +59,13 @@ TOP_LIMIT = SCREEN_HEIGHT + OFFSCREEN_SPACE
 SPACESHIPS = ["playerShip1_orange","playerShip2_orange","playerShip3_orange","playerShip1_green"]
 NOT_SPLITTING = 0
 SPLITTING = 50
-
+LAZAR_BAR_WIDTH = 300
+LAZAR_BAR_HEIGHT = 10
+LAZAR_BAR_BOARDER = 2
+LAZAR_BAR_BACKGROUND_COLOUR = arcade.color.GRAY
+LAZAR_BAR_WARMING_UP_COLOUR = arcade.color.DARK_BLUE
+LAZAR_BAR_READY_COLOUR = arcade.color.LIGHT_BLUE
+LAZAR_READY_MAX = 250
 
 class TurningSprite(arcade.Sprite):
     """ Sprite that sets its angle to the direction it is traveling in. """
@@ -108,7 +116,7 @@ class ShipSprite(arcade.Sprite):
         if self.respawning:
             self.respawning += 1
             self.alpha = self.respawning
-            if self.respawning > 250:
+            if self.respawning > LAZAR_READY_MAX:
                 self.respawning = 0
                 self.alpha = 255
         if self.speed > 0:
@@ -208,6 +216,7 @@ class MyGame(arcade.Window):
         self.frame_count = 0
 
         self.game_over = False
+        self.game_won = False
 
         # Sprite lists
         self.all_sprites_list = arcade.SpriteList()
@@ -234,6 +243,11 @@ class MyGame(arcade.Window):
 
         self.set_mouse_visible(True)
 
+    def lazar_bar_colour(self):
+        if self.player_sprite.respawning == 0:
+            return LAZAR_BAR_READY_COLOUR
+        
+        return LAZAR_BAR_WARMING_UP_COLOUR
 
     def create_asteroid(self, center_x = None, center_y = None):
         image_no = random.randrange(4)
@@ -256,6 +270,7 @@ class MyGame(arcade.Window):
 
         self.frame_count = 0
         self.game_over = False
+        self.game_won = False
         self.paused = False
 
         # Sprite lists
@@ -311,6 +326,8 @@ class MyGame(arcade.Window):
             "Keys: Esc=Exit, Enter=New Game, Pause=Pause/Unpause, Space=Shoot, Left/Right=Turn, Up/Down=Move, MouseClick=New Asteroid",
             400, 5, arcade.color.AERO_BLUE, 13)
 
+        self.draw_lazar_bar()
+        
         if self.game_won:
             arcade.draw_text("YOU WON!", self.width / 2, self.height / 2,
                             arcade.color.YELLOW, 50, align="center", anchor_x="center",
@@ -321,6 +338,31 @@ class MyGame(arcade.Window):
             arcade.draw_text("GAME OVER!", self.width / 2, self.height / 2,
                             arcade.color.YELLOW, 50, align="center", anchor_x="center",
                             anchor_y="center", rotation=8)
+
+    def draw_lazar_bar(self):
+        # draw the background
+        arcade.draw_xywh_rectangle_filled(
+            10,
+            self.height - LAZAR_BAR_HEIGHT - 10,
+            LAZAR_BAR_WIDTH,
+            LAZAR_BAR_HEIGHT,
+            LAZAR_BAR_BACKGROUND_COLOUR
+            )
+
+        # draw available lazar indicator
+        arcade.draw_xywh_rectangle_filled(
+            10 + LAZAR_BAR_BOARDER,
+            self.height - LAZAR_BAR_HEIGHT - 10 + LAZAR_BAR_BOARDER,
+            (LAZAR_BAR_WIDTH - LAZAR_BAR_BOARDER * 2) * self.lazar_percent_ready(),
+            LAZAR_BAR_HEIGHT - LAZAR_BAR_BOARDER * 2,
+            self.lazar_bar_colour()
+            )
+
+    def lazar_percent_ready(self):
+        if self.player_sprite.respawning == 0:
+            return 1
+        
+        return self.player_sprite.respawning / LAZAR_READY_MAX
 
     def on_mouse_press(self, x, y, button, modifiers):
         if not self.paused:
