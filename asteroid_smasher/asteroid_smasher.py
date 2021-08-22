@@ -14,11 +14,11 @@ TODO:
 [X] Keyboard shortcuts on screen
 [X] If player wins the level, tell them they've won
 [X] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
+[X] (M) When you've lost, don't show the spaceship
 [ ] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases - if you run out, lazer overheats, have to wait for grey bar again
 [ ] (M) Make at least some of the asteroids change direction towards you
-[0] (S) Upgrade `archade` version
-[ ] (S) When you've lost, don't show the spaceship
-[ ] (S) Ask "Do you want to restart?" when Enter is pressed
+[ ] (S)** Upgrade `arcade` version
+[ ] (M)** Ask "Do you want to restart?" when Enter is pressed
 [ ] (S) Prevent mouse from creating too many asteroids
 [ ] (S) Prevent mouse from creating asteroids too close to player
 [ ] (S) Bullets can wrap around, but only once
@@ -65,7 +65,7 @@ LAZAR_BAR_BOARDER = 2
 LAZAR_BAR_BACKGROUND_COLOUR = arcade.color.GRAY
 LAZAR_BAR_WARMING_UP_COLOUR = arcade.color.DARK_BLUE
 LAZAR_BAR_READY_COLOUR = arcade.color.LIGHT_BLUE
-LAZAR_READY_MAX = 250
+LAZAR_READY_MAX = 200
 
 class TurningSprite(arcade.Sprite):
     """ Sprite that sets its angle to the direction it is traveling in. """
@@ -158,8 +158,9 @@ class ShipSprite(arcade.Sprite):
         super().update()
 
     def draw(self):
-        if not self.game_over:
-            super().draw()
+        if self.game_over:
+            return
+        super().draw()
 
 class AsteroidSprite(arcade.Sprite):
     """ Sprite that represents an asteroid. """
@@ -213,22 +214,6 @@ class MyGame(arcade.Window):
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
 
-        self.frame_count = 0
-
-        self.game_over = False
-        self.game_won = False
-
-        # Sprite lists
-        self.all_sprites_list = arcade.SpriteList()
-        self.asteroid_list = arcade.SpriteList()
-        self.bullet_list = arcade.SpriteList()
-        self.ship_life_list = arcade.SpriteList()
-
-        # Set up the player
-        self.score = 0
-        self.player_sprite = None
-        self.lives = STARTING_LIVES
-
         # Sounds
         self.laser_sound = arcade.load_sound(":resources:sounds/hurt5.wav")
         self.hit_sound1 = arcade.load_sound(":resources:sounds/explosion1.wav")
@@ -242,6 +227,8 @@ class MyGame(arcade.Window):
                                 ":resources:images/space_shooter/meteorGrey_big4.png")
 
         self.set_mouse_visible(True)
+
+        self.start_new_game()
 
     def lazar_bar_colour(self):
         if self.player_sprite.respawning == 0:
@@ -262,7 +249,7 @@ class MyGame(arcade.Window):
 
         enemy_sprite.change_angle = (random.random() - 0.5) * 2
         enemy_sprite.size = 4
-        self.all_sprites_list.append(enemy_sprite)
+        self.all_non_player_sprites_list.append(enemy_sprite)
         self.asteroid_list.append(enemy_sprite)
 
     def start_new_game(self):
@@ -274,7 +261,7 @@ class MyGame(arcade.Window):
         self.paused = False
 
         # Sprite lists
-        self.all_sprites_list = arcade.SpriteList()
+        self.all_non_player_sprites_list = arcade.SpriteList()
         self.asteroid_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
         self.ship_life_list = arcade.SpriteList()
@@ -284,7 +271,6 @@ class MyGame(arcade.Window):
         self.current_ship = 0
         self.player_sprite = ShipSprite(f":resources:images/space_shooter/{SPACESHIPS[self.current_ship]}.png"
                                         , SCALE)
-        self.all_sprites_list.append(self.player_sprite)
         self.lives = STARTING_LIVES
 
         # Set up the little icons that represent the player lives.
@@ -294,7 +280,7 @@ class MyGame(arcade.Window):
             life.center_x = cur_pos + life.width
             life.center_y = life.height
             cur_pos += life.width
-            self.all_sprites_list.append(life)
+            self.all_non_player_sprites_list.append(life)
             self.ship_life_list.append(life)
 
         # Make the asteroids
@@ -312,8 +298,11 @@ class MyGame(arcade.Window):
         # This command has to happen before we start drawing
         arcade.start_render()
 
-        # Draw all the sprites.
-        self.all_sprites_list.draw()
+        # Draw all the non-player sprites.
+        self.all_non_player_sprites_list.draw()
+
+        # Draw the player sprites.
+        self.player_sprite.draw()
 
         # Put the text on the screen.
         output = f"Score: {self.score}"
@@ -374,6 +363,7 @@ class MyGame(arcade.Window):
         if symbol == arcade.key.ESCAPE:
             arcade.close_window()
         if symbol == arcade.key.ENTER:
+            
             self.start_new_game()
         if symbol == arcade.key.PAUSE:
             self.paused = False if self.paused else True
@@ -395,7 +385,7 @@ class MyGame(arcade.Window):
                 bullet_sprite.center_y = self.player_sprite.center_y
                 bullet_sprite.update()
 
-                self.all_sprites_list.append(bullet_sprite)
+                self.all_non_player_sprites_list.append(bullet_sprite)
                 self.bullet_list.append(bullet_sprite)
 
                 arcade.play_sound(self.laser_sound)
@@ -446,7 +436,7 @@ class MyGame(arcade.Window):
 
                 enemy_sprite.splitting = SPLITTING
 
-                self.all_sprites_list.append(enemy_sprite)
+                self.all_non_player_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
                 self.hit_sound1.play()
 
@@ -470,7 +460,7 @@ class MyGame(arcade.Window):
 
                 enemy_sprite.splitting = SPLITTING
 
-                self.all_sprites_list.append(enemy_sprite)
+                self.all_non_player_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
                 self.hit_sound2.play()
 
@@ -494,7 +484,7 @@ class MyGame(arcade.Window):
 
                 enemy_sprite.splitting = SPLITTING
                 
-                self.all_sprites_list.append(enemy_sprite)
+                self.all_non_player_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
                 self.hit_sound3.play()
 
@@ -543,7 +533,8 @@ class MyGame(arcade.Window):
         
         self.frame_count += 1
 
-        self.all_sprites_list.update() 
+        self.all_non_player_sprites_list.update()
+        self.player_sprite.update()
 
         self.process_bullets_colliding_with_asteroids()
         self.process_asteroids_colliding_with_asteroids()
