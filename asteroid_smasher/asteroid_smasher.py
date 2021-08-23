@@ -15,8 +15,13 @@ TODO:
 [X] If player wins the level, tell them they've won
 [X] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
 [X] (M) When you've lost, don't show the spaceship
-[ ] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases - if you run out, lazer overheats, have to wait for grey bar again
+[X] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases
+[ ] (S) if you run out, lazer overheats, have to wait for grey bar again
+[ ] (S) Smallest asteroids don't collide
+[ ] (S) Make more meteor sizes
+[?] (S) Add bullets used score
 [ ] (M) Make at least some of the asteroids change direction towards you
+[ ] (S) Make remaining lives indicators faint when used up and bigger
 [ ] (S)** Upgrade `arcade` version
 [ ] (M)** Ask "Do you want to restart?" when Enter is pressed
 [ ] (S) Prevent mouse from creating too many asteroids
@@ -65,7 +70,9 @@ LAZAR_BAR_BOARDER = 2
 LAZAR_BAR_BACKGROUND_COLOUR = arcade.color.GRAY
 LAZAR_BAR_WARMING_UP_COLOUR = arcade.color.DARK_BLUE
 LAZAR_BAR_READY_COLOUR = arcade.color.LIGHT_BLUE
-LAZAR_READY_MAX = 200
+LAZAR_DECREASE_RATE = 30
+LAZAR_CAPACITY_MAX = 200
+MAX_SOLID = 255
 
 class TurningSprite(arcade.Sprite):
     """ Sprite that sets its angle to the direction it is traveling in. """
@@ -80,7 +87,7 @@ class ShipSprite(arcade.Sprite):
 
     Derives from arcade.Sprite.
     """
-    def __init__(self, filename, scale):
+    def __init__(self, filename, scale, game_over_fn, game_won_fn):
         """ Set up the space ship. """
 
         # Call the parent Sprite constructor
@@ -92,8 +99,10 @@ class ShipSprite(arcade.Sprite):
         self.speed = 0
         self.max_speed = 4
         self.drag = 0.05
-        self.respawning = 0
-        self.game_over = False
+        self.respawning = True
+        self.lazar_capacity = 0
+        self.is_game_over = game_over_fn
+        self.is_game_won = game_won_fn
 
         # Mark that we are respawning.
         self.respawn()
@@ -103,8 +112,8 @@ class ShipSprite(arcade.Sprite):
         Called when we die and need to make a new ship.
         'respawning' is an invulnerability timer.
         """
-        # If we are in the middle of respawning, this is non-zero.
-        self.respawning = 1
+        self.respawning = True
+        self.lazar_capacity = 0
         self.center_x = SCREEN_WIDTH / 2
         self.center_y = SCREEN_HEIGHT / 2
         self.angle = 0
@@ -113,12 +122,15 @@ class ShipSprite(arcade.Sprite):
         """
         Update our position and other particulars.
         """
+        if self.lazar_capacity < LAZAR_CAPACITY_MAX:
+            self.lazar_capacity += 1
+
         if self.respawning:
-            self.respawning += 1
-            self.alpha = self.respawning
-            if self.respawning > LAZAR_READY_MAX:
-                self.respawning = 0
-                self.alpha = 255
+            self.alpha = self.lazar_capacity
+            if self.lazar_capacity == LAZAR_CAPACITY_MAX:
+                self.respawning = False
+                self.alpha = MAX_SOLID
+                
         if self.speed > 0:
             self.speed -= self.drag
             if self.speed < 0:
@@ -158,9 +170,8 @@ class ShipSprite(arcade.Sprite):
         super().update()
 
     def draw(self):
-        if self.game_over:
-            return
-        super().draw()
+        if not self.is_game_over() or self.is_game_won():
+            super().draw()
 
 class AsteroidSprite(arcade.Sprite):
     """ Sprite that represents an asteroid. """
@@ -231,7 +242,7 @@ class MyGame(arcade.Window):
         self.start_new_game()
 
     def lazar_bar_colour(self):
-        if self.player_sprite.respawning == 0:
+        if not self.player_sprite.respawning:
             return LAZAR_BAR_READY_COLOUR
         
         return LAZAR_BAR_WARMING_UP_COLOUR
@@ -252,6 +263,17 @@ class MyGame(arcade.Window):
         self.all_non_player_sprites_list.append(enemy_sprite)
         self.asteroid_list.append(enemy_sprite)
 
+    def is_game_over(self):
+        return self.game_over
+
+    def is_game_won(self):
+        return self.game_won
+    
+    def game_is_won(self):
+        self.game_won = True
+        self.game_over = True
+        print("You won!")
+
     def start_new_game(self):
         """ Set up the game and initialize the variables. """
 
@@ -269,8 +291,11 @@ class MyGame(arcade.Window):
         # Set up the player
         self.score = 0
         self.current_ship = 0
-        self.player_sprite = ShipSprite(f":resources:images/space_shooter/{SPACESHIPS[self.current_ship]}.png"
-                                        , SCALE)
+        self.player_sprite = ShipSprite(
+            f":resources:images/space_shooter/{SPACESHIPS[self.current_ship]}.png"
+            , SCALE
+            , self.is_game_over
+            , self.is_game_won)
         self.lives = STARTING_LIVES
 
         # Set up the little icons that represent the player lives.
@@ -348,10 +373,7 @@ class MyGame(arcade.Window):
             )
 
     def lazar_percent_ready(self):
-        if self.player_sprite.respawning == 0:
-            return 1
-        
-        return self.player_sprite.respawning / LAZAR_READY_MAX
+        return self.player_sprite.lazar_capacity / LAZAR_CAPACITY_MAX
 
     def on_mouse_press(self, x, y, button, modifiers):
         if not self.paused:
@@ -370,7 +392,14 @@ class MyGame(arcade.Window):
 
         if not self.game_over and not self.paused:
             # Shoot if the player hit the space bar and we aren't respawning.
-            if not self.player_sprite.respawning and symbol == arcade.key.SPACE:
+            if (    symbol == arcade.key.SPACE and \
+                    not self.player_sprite.respawning and \
+                    self.player_sprite.lazar_capacity >= LAZAR_DECREASE_RATE
+            ):
+                self.player_sprite.lazar_capacity = self.player_sprite.lazar_capacity - LAZAR_DECREASE_RATE
+                if self.player_sprite.lazar_capacity < 0:
+                    self.player_sprite.lazar_capacity = 0
+                
                 bullet_sprite = BulletSprite(":resources:images/space_shooter/laserBlue01.png", SCALE)
                 bullet_sprite.guid = "Bullet"
 
@@ -546,10 +575,7 @@ class MyGame(arcade.Window):
             return
  
         if self.number_of_asteroids() == 0:
-            self.game_won = True
-            self.game_over = True
-            self.player_sprite.game_over = True
-            print("You won!")
+            self.game_is_won()
             return
         
         asteroids = arcade.check_for_collision_with_list(self.player_sprite, self.asteroid_list)
@@ -567,7 +593,6 @@ class MyGame(arcade.Window):
             print("Crash")
         else:
             self.game_over = True
-            self.player_sprite.game_over = True
             print("Game over")
                     
 
