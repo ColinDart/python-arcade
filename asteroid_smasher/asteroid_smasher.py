@@ -16,16 +16,16 @@ TODO:
 [X] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
 [X] (M) When you've lost, don't show the spaceship
 [X] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases
-[ ] (S) if you run out, lazer overheats, have to wait for grey bar again
-[ ] (S) Smallest asteroids don't collide
+[ ] (M) if you run out, lazer overheats, have to wait for grey bar again
+[.] (S) Smallest asteroids don't collide
 [ ] (S) Make more meteor sizes
-[?] (S) Add bullets used score
 [ ] (M) Make at least some of the asteroids change direction towards you
 [ ] (S) Make remaining lives indicators faint when used up and bigger
 [ ] (S)** Upgrade `arcade` version
 [ ] (M)** Ask "Do you want to restart?" when Enter is pressed
 [ ] (S) Prevent mouse from creating too many asteroids
 [ ] (S) Prevent mouse from creating asteroids too close to player
+[X] (s) Don't count asteroids that smashed into each other in the score
 [ ] (S) Bullets can wrap around, but only once
 [ ] (S) Our own bullets can kill us!
 [ ] (S) When you've won, the spaceship flies off the screen
@@ -36,6 +36,7 @@ TODO:
 [ ] (S) Can't add asteroids after you've won
 [ ] (L) Make a home screen (leaderboard, play, level selection)
 [ ] (L) Package the game for playing sepearately (https://api.arcade.academy/en/latest/tutorials/bundling_with_pyinstaller/index.html)
+[ ] (S) Add bullets used score
 [ ] (L) Make different prize levels
 [ ] (M) Prizes can give different spaceships
 [ ] (L) Add settings (silent mode, turn on/off features, adjust limits)
@@ -443,7 +444,6 @@ class MyGame(arcade.Window):
         """ Split an asteroid into chunks. """
         x = asteroid.center_x
         y = asteroid.center_y
-        self.score += 1
 
         if asteroid.size == 4:
             for i in range(3):
@@ -530,6 +530,7 @@ class MyGame(arcade.Window):
                 asteroids = asteroids_spatial
 
                 for asteroid in asteroids:
+                    self.score += 1
                     self.split_asteroid(cast(AsteroidSprite, asteroid))  # expected AsteroidSprite, got Sprite instead
                     asteroid.remove_from_sprite_lists()
                     bullet.remove_from_sprite_lists()
@@ -578,23 +579,25 @@ class MyGame(arcade.Window):
             self.game_is_won()
             return
         
-        asteroids = arcade.check_for_collision_with_list(self.player_sprite, self.asteroid_list)
+        self.process_asteroids_colliding_with_player()
 
-        if len(asteroids) == 0:
+    def process_asteroids_colliding_with_player(self):
+        asteroidDamage = arcade.check_for_collision_with_list(self.player_sprite, self.asteroid_list)
+
+        if len(asteroidDamage) == 0:
             return
 
         if self.lives > 0:
             self.lives -= 1
             self.current_ship += 1
             self.player_sprite.respawn()
-            self.split_asteroid(cast(AsteroidSprite, asteroids[0]))
-            asteroids[0].remove_from_sprite_lists()
+            self.split_asteroid(cast(AsteroidSprite, asteroidDamage[0]))
+            asteroidDamage[0].remove_from_sprite_lists()
             self.ship_life_list.pop().remove_from_sprite_lists()
             print("Crash")
         else:
             self.game_over = True
             print("Game over")
-                    
 
 
 def main():
