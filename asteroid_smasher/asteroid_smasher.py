@@ -18,8 +18,8 @@ TODO:
 [X] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases
 [X] (S) Don't count asteroids that smashed into each other in the score
 [X] (S) Smallest asteroids don't collide
+[X] (S) Make more meteor sizes
 [ ] (M) if you run out, lazer overheats, have to wait for grey bar again
-[ ] (S) Make more meteor sizes
 [ ] (M) Make at least some of the asteroids change direction towards you
 [ ] (S) Make remaining lives indicators faint when used up and bigger
 [ ] (S)** Upgrade `arcade` version
@@ -232,6 +232,7 @@ class MyGame(arcade.Window):
         self.hit_sound2 = arcade.load_sound(":resources:sounds/explosion2.wav")
         self.hit_sound3 = arcade.load_sound(":resources:sounds/hit1.wav")
         self.hit_sound4 = arcade.load_sound(":resources:sounds/hit2.wav")
+        self.hit_sound5 = arcade.load_sound(":resources:sounds/hit3.wav")
 
         self.meteor_image_list = (":resources:images/space_shooter/meteorGrey_big1.png",
                                 ":resources:images/space_shooter/meteorGrey_big2.png",
@@ -250,7 +251,7 @@ class MyGame(arcade.Window):
 
     def create_asteroid(self, center_x = None, center_y = None):
         image_no = random.randrange(4)
-        enemy_sprite = AsteroidSprite(self.meteor_image_list[image_no], SCALE)
+        enemy_sprite = AsteroidSprite(self.meteor_image_list[image_no], SCALE * 1.5)
         enemy_sprite.guid = "Asteroid"
 
         enemy_sprite.center_x = center_x or random.randrange(LEFT_LIMIT, RIGHT_LIMIT)
@@ -260,7 +261,7 @@ class MyGame(arcade.Window):
         enemy_sprite.change_y = random.random() * 2 - 1
 
         enemy_sprite.change_angle = (random.random() - 0.5) * 2
-        enemy_sprite.size = 4
+        enemy_sprite.size = 5
         self.all_non_player_sprites_list.append(enemy_sprite)
         self.asteroid_list.append(enemy_sprite)
 
@@ -445,6 +446,27 @@ class MyGame(arcade.Window):
         x = asteroid.center_x
         y = asteroid.center_y
 
+        if asteroid.size == 5:
+            for i in range(3):
+                image_no = random.randrange(4)
+                enemy_sprite = AsteroidSprite(self.meteor_image_list[image_no],
+                                              SCALE)
+                
+                enemy_sprite.center_y = y
+                enemy_sprite.center_x = x
+
+                enemy_sprite.change_x = random.random() * 2.5 - 1.25
+                enemy_sprite.change_y = random.random() * 2.5 - 1.25
+
+                enemy_sprite.change_angle = (random.random() - 0.5) * 2
+                enemy_sprite.size = 4
+
+                enemy_sprite.splitting = SPLITTING
+
+                self.all_non_player_sprites_list.append(enemy_sprite)
+                self.asteroid_list.append(enemy_sprite)
+                self.hit_sound1.play()
+
         if asteroid.size == 4:
             for i in range(3):
                 image_no = random.randrange(2)
@@ -467,7 +489,7 @@ class MyGame(arcade.Window):
 
                 self.all_non_player_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
-                self.hit_sound1.play()
+                self.hit_sound2.play()
 
         elif asteroid.size == 3:
             for i in range(3):
@@ -491,7 +513,7 @@ class MyGame(arcade.Window):
 
                 self.all_non_player_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
-                self.hit_sound2.play()
+                self.hit_sound3.play()
 
         elif asteroid.size == 2:
             for i in range(3):
@@ -515,10 +537,10 @@ class MyGame(arcade.Window):
                 
                 self.all_non_player_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
-                self.hit_sound3.play()
+                self.hit_sound4.play()
 
         elif asteroid.size == 1:
-            self.hit_sound4.play()
+            self.hit_sound5.play()
 
     def process_bullets_colliding_with_asteroids(self):
         for bullet in self.bullet_list:
