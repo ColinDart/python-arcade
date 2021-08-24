@@ -16,8 +16,9 @@ TODO:
 [X] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
 [X] (M) When you've lost, don't show the spaceship
 [X] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases
+[X] (S) Don't count asteroids that smashed into each other in the score
+[X] (S) Smallest asteroids don't collide
 [ ] (M) if you run out, lazer overheats, have to wait for grey bar again
-[.] (S) Smallest asteroids don't collide
 [ ] (S) Make more meteor sizes
 [ ] (M) Make at least some of the asteroids change direction towards you
 [ ] (S) Make remaining lives indicators faint when used up and bigger
@@ -25,7 +26,6 @@ TODO:
 [ ] (M)** Ask "Do you want to restart?" when Enter is pressed
 [ ] (S) Prevent mouse from creating too many asteroids
 [ ] (S) Prevent mouse from creating asteroids too close to player
-[X] (s) Don't count asteroids that smashed into each other in the score
 [ ] (S) Bullets can wrap around, but only once
 [ ] (S) Our own bullets can kill us!
 [ ] (S) When you've won, the spaceship flies off the screen
@@ -542,10 +542,16 @@ class MyGame(arcade.Window):
             asteroids_colliding = arcade.check_for_collision_with_list(asteroid, self.asteroid_list)
             
             for collision in asteroids_colliding:
-                if collision != asteroid and collision.splitting == NOT_SPLITTING and asteroid.splitting == NOT_SPLITTING:
-                    asteroids_to_split.append(collision)
-                    asteroids_to_split.append(asteroid)
-                    collided = True
+                if (    collision != asteroid and
+                        collision.splitting == NOT_SPLITTING and
+                        asteroid.splitting == NOT_SPLITTING
+                   ):
+                    if collision.size > 1:
+                        asteroids_to_split.append(collision)
+                        collided = True
+                    if asteroid.size > 1:
+                        asteroids_to_split.append(asteroid)
+                        collided = True
                     break
             
             if collided:
