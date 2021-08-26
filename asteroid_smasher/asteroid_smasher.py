@@ -19,7 +19,7 @@ TODO:
 [X] (S) Don't count asteroids that smashed into each other in the score
 [X] (S) Smallest asteroids don't collide
 [X] (S) Make more meteor sizes
-[ ] (M) if you run out, lazer overheats, have to wait for grey bar again
+[X] (M) if you fill the bar, lazer overheats, have to wait until its empty again
 [ ] (M) Make at least some of the asteroids change direction towards you
 [ ] (S) Make remaining lives indicators faint when used up and bigger
 [ ] (S)** Upgrade `arcade` version
@@ -29,6 +29,7 @@ TODO:
 [ ] (S) Bullets can wrap around, but only once
 [ ] (S) Our own bullets can kill us!
 [ ] (S) When you've won, the spaceship flies off the screen
+[ ] (s) make spaceship respawn in difint plasers
 [ ] (S) Bullets can wrap a random number of times
 [ ] (S) Randomly (not too often) a new asteroid can appear (but only if game is not over)
 [ ] (L) Tell the player if they get a score on the leaderboard (they can enter a name when they get on)
@@ -43,6 +44,7 @@ TODO:
 [ ] (S) Make shortcuts right-aligned (automatically fit on the screen)
 [ ] (M) Split into different files
 [ ] (M) Add instructions
+[ ] (S) Change asteropid colour or sound as they get closer
 """
 import random
 import math
@@ -69,9 +71,12 @@ LAZAR_BAR_WIDTH = 300
 LAZAR_BAR_HEIGHT = 10
 LAZAR_BAR_BOARDER = 2
 LAZAR_BAR_BACKGROUND_COLOUR = arcade.color.GRAY
-LAZAR_BAR_WARMING_UP_COLOUR = arcade.color.DARK_BLUE
-LAZAR_BAR_READY_COLOUR = arcade.color.LIGHT_BLUE
-LAZAR_DECREASE_RATE = 30
+LAZAR_BAR_READY_COLOUR = arcade.color.DARK_BLUE
+LAZAR_BAR_COOL_COLOUR = arcade.color.LIGHT_BLUE
+LAZAR_BAR_WARM_COLOUR = arcade.color.PURPLE
+LAZAR_BAR_HOT_COLOUR = arcade.color.ORANGE
+LAZAR_BAR_OVERHEATED_COLOUR = arcade.color.RED
+LAZAR_HEAT_RATE = 30
 LAZAR_CAPACITY_MAX = 200
 MAX_SOLID = 255
 
@@ -102,6 +107,8 @@ class ShipSprite(arcade.Sprite):
         self.drag = 0.05
         self.respawning = True
         self.lazar_capacity = 0
+        self.lazar_heat = 0
+        self.lazar_overheated = False
         self.is_game_over = game_over_fn
         self.is_game_won = game_won_fn
 
@@ -115,9 +122,17 @@ class ShipSprite(arcade.Sprite):
         """
         self.respawning = True
         self.lazar_capacity = 0
+        self.lazar_heat = 0
+        self.lazar_overheated = False
         self.center_x = SCREEN_WIDTH / 2
         self.center_y = SCREEN_HEIGHT / 2
         self.angle = 0
+
+    def lazar_percent_heated(self):
+        return self.lazar_heat / LAZAR_CAPACITY_MAX
+
+    def lazar_percent_ready(self):
+        return self.lazar_capacity / LAZAR_CAPACITY_MAX
 
     def update(self):
         """
@@ -126,12 +141,20 @@ class ShipSprite(arcade.Sprite):
         if self.lazar_capacity < LAZAR_CAPACITY_MAX:
             self.lazar_capacity += 1
 
+        if self.lazar_heat == LAZAR_CAPACITY_MAX:
+            self.lazar_overheated = True
+
+        if self.lazar_heat > 0:
+            self.lazar_heat -= 1
+            if self.lazar_heat == 0:
+                self.lazar_overheated = False
+
         if self.respawning:
             self.alpha = self.lazar_capacity
             if self.lazar_capacity == LAZAR_CAPACITY_MAX:
                 self.respawning = False
                 self.alpha = MAX_SOLID
-                
+        
         if self.speed > 0:
             self.speed -= self.drag
             if self.speed < 0:
@@ -244,10 +267,16 @@ class MyGame(arcade.Window):
         self.start_new_game()
 
     def lazar_bar_colour(self):
-        if not self.player_sprite.respawning:
-            return LAZAR_BAR_READY_COLOUR
+        if self.player_sprite.lazar_overheated:
+            return LAZAR_BAR_OVERHEATED_COLOUR
         
-        return LAZAR_BAR_WARMING_UP_COLOUR
+        if self.player_sprite.lazar_percent_heated() > 0.66:
+            return LAZAR_BAR_HOT_COLOUR
+
+        if self.player_sprite.lazar_percent_heated() > 0.33:
+            return LAZAR_BAR_WARM_COLOUR
+
+        return LAZAR_BAR_COOL_COLOUR
 
     def create_asteroid(self, center_x = None, center_y = None):
         image_no = random.randrange(4)
@@ -365,17 +394,23 @@ class MyGame(arcade.Window):
             LAZAR_BAR_BACKGROUND_COLOUR
             )
 
-        # draw available lazar indicator
+        # draw lazar ready indicator
         arcade.draw_xywh_rectangle_filled(
             10 + LAZAR_BAR_BOARDER,
             self.height - LAZAR_BAR_HEIGHT - 10 + LAZAR_BAR_BOARDER,
-            (LAZAR_BAR_WIDTH - LAZAR_BAR_BOARDER * 2) * self.lazar_percent_ready(),
+            (LAZAR_BAR_WIDTH - LAZAR_BAR_BOARDER * 2) * self.player_sprite.lazar_percent_ready(),
+            LAZAR_BAR_HEIGHT - LAZAR_BAR_BOARDER * 2,
+            LAZAR_BAR_READY_COLOUR
+            )
+
+        # draw lazar heat indicator
+        arcade.draw_xywh_rectangle_filled(
+            10 + LAZAR_BAR_BOARDER,
+            self.height - LAZAR_BAR_HEIGHT - 10 + LAZAR_BAR_BOARDER,
+            (LAZAR_BAR_WIDTH - LAZAR_BAR_BOARDER * 2) * self.player_sprite.lazar_percent_heated(),
             LAZAR_BAR_HEIGHT - LAZAR_BAR_BOARDER * 2,
             self.lazar_bar_colour()
             )
-
-    def lazar_percent_ready(self):
-        return self.player_sprite.lazar_capacity / LAZAR_CAPACITY_MAX
 
     def on_mouse_press(self, x, y, button, modifiers):
         if not self.paused:
@@ -396,11 +431,12 @@ class MyGame(arcade.Window):
             # Shoot if the player hit the space bar and we aren't respawning.
             if (    symbol == arcade.key.SPACE and \
                     not self.player_sprite.respawning and \
-                    self.player_sprite.lazar_capacity >= LAZAR_DECREASE_RATE
+                    self.player_sprite.lazar_capacity == LAZAR_CAPACITY_MAX and \
+                    not self.player_sprite.lazar_overheated
             ):
-                self.player_sprite.lazar_capacity = self.player_sprite.lazar_capacity - LAZAR_DECREASE_RATE
-                if self.player_sprite.lazar_capacity < 0:
-                    self.player_sprite.lazar_capacity = 0
+                self.player_sprite.lazar_heat += LAZAR_HEAT_RATE
+                if self.player_sprite.lazar_heat > LAZAR_CAPACITY_MAX:
+                    self.player_sprite.lazar_heat = LAZAR_CAPACITY_MAX
                 
                 bullet_sprite = BulletSprite(":resources:images/space_shooter/laserBlue01.png", SCALE)
                 bullet_sprite.guid = "Bullet"
