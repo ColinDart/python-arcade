@@ -79,6 +79,8 @@ LAZAR_BAR_OVERHEATED_COLOUR = arcade.color.RED
 LAZAR_HEAT_RATE = 30
 LAZAR_CAPACITY_MAX = 200
 MAX_SOLID = 255
+ASTEROID_COLLISION_RATE_RANGE = 10000
+ASTEROID_COLLISION_THRESHOLD = 10
 
 class TurningSprite(arcade.Sprite):
     """ Sprite that sets its angle to the direction it is traveling in. """
@@ -600,9 +602,11 @@ class MyGame(arcade.Window):
             asteroids_colliding = arcade.check_for_collision_with_list(asteroid, self.asteroid_list)
             
             for collision in asteroids_colliding:
+                CHANCE_OF_COLLISION = random.randint(0, ASTEROID_COLLISION_RATE_RANGE)
                 if (    collision != asteroid and
                         collision.splitting == NOT_SPLITTING and
-                        asteroid.splitting == NOT_SPLITTING
+                        asteroid.splitting == NOT_SPLITTING and
+                        CHANCE_OF_COLLISION < ASTEROID_COLLISION_THRESHOLD
                    ):
                     if collision.size > 1:
                         asteroids_to_split.append(collision)
