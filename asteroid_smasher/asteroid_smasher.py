@@ -64,7 +64,7 @@ LEFT_LIMIT = -OFFSCREEN_SPACE
 RIGHT_LIMIT = SCREEN_WIDTH + OFFSCREEN_SPACE
 BOTTOM_LIMIT = -OFFSCREEN_SPACE
 TOP_LIMIT = SCREEN_HEIGHT + OFFSCREEN_SPACE
-SPACESHIPS = ["playerShip1_orange","playerShip2_orange","playerShip3_orange","playerShip1_green"]
+SPACESHIPS = ["playerShip1_orange", "playerShip2_orange", "playerShip3_orange", "playerShip1_green"]
 NOT_SPLITTING = 0
 SPLITTING = 50
 LAZAR_BAR_WIDTH = 300
@@ -84,6 +84,7 @@ ASTEROID_COLLISION_THRESHOLD = 10
 
 class TurningSprite(arcade.Sprite):
     """ Sprite that sets its angle to the direction it is traveling in. """
+
     def update(self):
         super().update()
         self.angle = math.degrees(math.atan2(self.change_y, self.change_x))
@@ -95,6 +96,7 @@ class ShipSprite(arcade.Sprite):
 
     Derives from arcade.Sprite.
     """
+
     def __init__(self, filename, scale, game_over_fn, game_won_fn):
         """ Set up the space ship. """
 
@@ -156,7 +158,7 @@ class ShipSprite(arcade.Sprite):
             if self.lazar_capacity == LAZAR_CAPACITY_MAX:
                 self.respawning = False
                 self.alpha = MAX_SOLID
-        
+
         if self.speed > 0:
             self.speed -= self.drag
             if self.speed < 0:
@@ -198,6 +200,7 @@ class ShipSprite(arcade.Sprite):
     def draw(self):
         if not self.is_game_over() or self.is_game_won():
             super().draw()
+
 
 class AsteroidSprite(arcade.Sprite):
     """ Sprite that represents an asteroid. """
@@ -260,9 +263,9 @@ class MyGame(arcade.Window):
         self.hit_sound5 = arcade.load_sound(":resources:sounds/hit3.wav")
 
         self.meteor_image_list = (":resources:images/space_shooter/meteorGrey_big1.png",
-                                ":resources:images/space_shooter/meteorGrey_big2.png",
-                                ":resources:images/space_shooter/meteorGrey_big3.png",
-                                ":resources:images/space_shooter/meteorGrey_big4.png")
+                                  ":resources:images/space_shooter/meteorGrey_big2.png",
+                                  ":resources:images/space_shooter/meteorGrey_big3.png",
+                                  ":resources:images/space_shooter/meteorGrey_big4.png")
 
         self.set_mouse_visible(True)
 
@@ -271,7 +274,7 @@ class MyGame(arcade.Window):
     def lazar_bar_colour(self):
         if self.player_sprite.lazar_overheated:
             return LAZAR_BAR_OVERHEATED_COLOUR
-        
+
         if self.player_sprite.lazar_percent_heated() > 0.66:
             return LAZAR_BAR_HOT_COLOUR
 
@@ -280,7 +283,7 @@ class MyGame(arcade.Window):
 
         return LAZAR_BAR_COOL_COLOUR
 
-    def create_asteroid(self, center_x = None, center_y = None):
+    def create_asteroid(self, center_x=None, center_y=None):
         image_no = random.randrange(4)
         enemy_sprite = AsteroidSprite(self.meteor_image_list[image_no], SCALE * 1.5)
         enemy_sprite.guid = "Asteroid"
@@ -301,7 +304,7 @@ class MyGame(arcade.Window):
 
     def is_game_won(self):
         return self.game_won
-    
+
     def game_is_won(self):
         self.game_won = True
         self.game_over = True
@@ -374,17 +377,17 @@ class MyGame(arcade.Window):
             400, 5, arcade.color.AERO_BLUE, 13)
 
         self.draw_lazar_bar()
-        
+
         if self.game_won:
             arcade.draw_text("YOU WON!", self.width / 2, self.height / 2,
-                            arcade.color.YELLOW, 50, align="center", anchor_x="center",
-                            anchor_y="center", rotation=8)
+                             arcade.color.YELLOW, 50, align="center", anchor_x="center",
+                             anchor_y="center", rotation=8)
             return
 
         if self.game_over:
             arcade.draw_text("GAME OVER!", self.width / 2, self.height / 2,
-                            arcade.color.YELLOW, 50, align="center", anchor_x="center",
-                            anchor_y="center", rotation=8)
+                             arcade.color.YELLOW, 50, align="center", anchor_x="center",
+                             anchor_y="center", rotation=8)
 
     def draw_lazar_bar(self):
         # draw the background
@@ -394,7 +397,7 @@ class MyGame(arcade.Window):
             LAZAR_BAR_WIDTH,
             LAZAR_BAR_HEIGHT,
             LAZAR_BAR_BACKGROUND_COLOUR
-            )
+        )
 
         # draw lazar ready indicator
         arcade.draw_xywh_rectangle_filled(
@@ -403,7 +406,7 @@ class MyGame(arcade.Window):
             (LAZAR_BAR_WIDTH - LAZAR_BAR_BOARDER * 2) * self.player_sprite.lazar_percent_ready(),
             LAZAR_BAR_HEIGHT - LAZAR_BAR_BOARDER * 2,
             LAZAR_BAR_READY_COLOUR
-            )
+        )
 
         # draw lazar heat indicator
         arcade.draw_xywh_rectangle_filled(
@@ -412,7 +415,7 @@ class MyGame(arcade.Window):
             (LAZAR_BAR_WIDTH - LAZAR_BAR_BOARDER * 2) * self.player_sprite.lazar_percent_heated(),
             LAZAR_BAR_HEIGHT - LAZAR_BAR_BOARDER * 2,
             self.lazar_bar_colour()
-            )
+        )
 
     def on_mouse_press(self, x, y, button, modifiers):
         if not self.paused:
@@ -420,18 +423,17 @@ class MyGame(arcade.Window):
 
     def on_key_press(self, symbol, modifiers):
         """ Called whenever a key is pressed. """
-        
+
         if symbol == arcade.key.ESCAPE:
             arcade.close_window()
         if symbol == arcade.key.ENTER:
-            
             self.start_new_game()
         if symbol == arcade.key.PAUSE:
             self.paused = False if self.paused else True
 
         if not self.game_over and not self.paused:
             # Shoot if the player hit the space bar and we aren't respawning.
-            if (    symbol == arcade.key.SPACE and \
+            if (symbol == arcade.key.SPACE and \
                     not self.player_sprite.respawning and \
                     self.player_sprite.lazar_capacity == LAZAR_CAPACITY_MAX and \
                     not self.player_sprite.lazar_overheated
@@ -439,7 +441,7 @@ class MyGame(arcade.Window):
                 self.player_sprite.lazar_heat += LAZAR_HEAT_RATE
                 if self.player_sprite.lazar_heat > LAZAR_CAPACITY_MAX:
                     self.player_sprite.lazar_heat = LAZAR_CAPACITY_MAX
-                
+
                 bullet_sprite = BulletSprite(":resources:images/space_shooter/laserBlue01.png", SCALE)
                 bullet_sprite.guid = "Bullet"
 
@@ -489,7 +491,7 @@ class MyGame(arcade.Window):
                 image_no = random.randrange(4)
                 enemy_sprite = AsteroidSprite(self.meteor_image_list[image_no],
                                               SCALE)
-                
+
                 enemy_sprite.center_y = y
                 enemy_sprite.center_x = x
 
@@ -572,7 +574,7 @@ class MyGame(arcade.Window):
                 enemy_sprite.size = 1
 
                 enemy_sprite.splitting = SPLITTING
-                
+
                 self.all_non_player_sprites_list.append(enemy_sprite)
                 self.asteroid_list.append(enemy_sprite)
                 self.hit_sound4.play()
@@ -582,32 +584,32 @@ class MyGame(arcade.Window):
 
     def process_bullets_colliding_with_asteroids(self):
         for bullet in self.bullet_list:
-                asteroids_plain = arcade.check_for_collision_with_list(bullet, self.asteroid_list)
-                asteroids_spatial = arcade.check_for_collision_with_list(bullet, self.asteroid_list)
-                if len(asteroids_plain) != len(asteroids_spatial):
-                    print("ERROR")
+            asteroids_plain = arcade.check_for_collision_with_list(bullet, self.asteroid_list)
+            asteroids_spatial = arcade.check_for_collision_with_list(bullet, self.asteroid_list)
+            if len(asteroids_plain) != len(asteroids_spatial):
+                print("ERROR")
 
-                asteroids = asteroids_spatial
+            asteroids = asteroids_spatial
 
-                for asteroid in asteroids:
-                    self.score += 1
-                    self.split_asteroid(cast(AsteroidSprite, asteroid))  # expected AsteroidSprite, got Sprite instead
-                    asteroid.remove_from_sprite_lists()
-                    bullet.remove_from_sprite_lists()
-    
+            for asteroid in asteroids:
+                self.score += 1
+                self.split_asteroid(cast(AsteroidSprite, asteroid))  # expected AsteroidSprite, got Sprite instead
+                asteroid.remove_from_sprite_lists()
+                bullet.remove_from_sprite_lists()
+
     def process_asteroids_colliding_with_asteroids(self):
-        asteroids_to_split : AsteroidSprite = []
+        asteroids_to_split: AsteroidSprite = []
         for asteroid in self.asteroid_list:
             collided = False
             asteroids_colliding = arcade.check_for_collision_with_list(asteroid, self.asteroid_list)
-            
+
             for collision in asteroids_colliding:
                 CHANCE_OF_COLLISION = random.randint(0, ASTEROID_COLLISION_RATE_RANGE)
-                if (    collision != asteroid and
+                if (collision != asteroid and
                         collision.splitting == NOT_SPLITTING and
                         asteroid.splitting == NOT_SPLITTING and
                         CHANCE_OF_COLLISION < ASTEROID_COLLISION_THRESHOLD
-                   ):
+                ):
                     if collision.size > 1:
                         asteroids_to_split.append(collision)
                         collided = True
@@ -615,20 +617,20 @@ class MyGame(arcade.Window):
                         asteroids_to_split.append(asteroid)
                         collided = True
                     break
-            
+
             if collided:
                 break
-        
+
         for asteroid in asteroids_to_split:
             self.split_asteroid(cast(AsteroidSprite, asteroid))  # expected AsteroidSprite, got Sprite instead
             asteroid.remove_from_sprite_lists()
-    
+
     def on_update(self, x):
         """ Move everything """
 
         if self.paused:
             return
-        
+
         self.frame_count += 1
 
         self.all_non_player_sprites_list.update()
@@ -642,11 +644,11 @@ class MyGame(arcade.Window):
 
         if self.player_sprite.respawning:
             return
- 
+
         if self.number_of_asteroids() == 0:
             self.game_is_won()
             return
-        
+
         self.process_asteroids_colliding_with_player()
 
     def process_asteroids_colliding_with_player(self):
