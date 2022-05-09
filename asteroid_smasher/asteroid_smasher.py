@@ -1,5 +1,5 @@
 """
-Asteroid Smasher
+Asteroid Smasher 2
 
 Shoot space rocks in this demo program created with
 Python and the Arcade library.
@@ -29,7 +29,7 @@ TODO:
 [ ] (S) Bullets can wrap around, but only once
 [ ] (S) Our own bullets can kill us!
 [ ] (S) When you've won, the spaceship flies off the screen
-[ ] (s) make spaceship respawn in difint plasers
+[ ] (s) make spaceship respawn in different places
 [ ] (S) Bullets can wrap a random number of times
 [ ] (S) Randomly (not too often) a new asteroid can appear (but only if game is not over)
 [ ] (L) Tell the player if they get a score on the leaderboard (they can enter a name when they get on)
@@ -44,7 +44,7 @@ TODO:
 [ ] (S) Make shortcuts right-aligned (automatically fit on the screen)
 [ ] (M) Split into different files
 [ ] (M) Add instructions
-[ ] (S) Change asteropid colour or sound as they get closer
+[ ] (S) Change asteroid colour or sound as they get closer
 """
 import random
 import math
@@ -53,7 +53,7 @@ import os
 
 from typing import cast
 
-STARTING_LIVES = 4
+STARTING_LIVES = 5
 STARTING_ASTEROID_COUNT = 1
 SCALE = 0.5
 OFFSCREEN_SPACE = 0
