@@ -13,20 +13,20 @@ TODO:
 [X] Make asteroids crash
 [X] Keyboard shortcuts on screen
 [X] If player wins the level, tell them they've won
-[X] (M) Show a grey bar for the lazer while you can't shoot - when it's full, it goes blue and you can shoot
+[X] (M) Show a grey bar for the laser while you can't shoot - when it's full, it goes blue and you can shoot
 [X] (M) When you've lost, don't show the spaceship
 [X] (M) When you shoot, blue lazar bar reduces, when you're not shooting it increases
 [X] (S) Don't count asteroids that smashed into each other in the score
 [X] (S) Smallest asteroids don't collide
 [X] (S) Make more meteor sizes
-[X] (M) if you fill the bar, lazer overheats, have to wait until its empty again
+[X] (M) if you fill the bar, laser overheats, have to wait until its empty again
 [ ] (M) Make at least some of the asteroids change direction towards you
 [ ] (S) Make remaining lives indicators faint when used up and bigger
 [ ] (S)** Upgrade `arcade` version
 [ ] (M)** Ask "Do you want to restart?" when Enter is pressed
 [ ] (S) Prevent mouse from creating too many asteroids
 [ ] (S) Prevent mouse from creating asteroids too close to player
-[ ] (S) Bullets can wrap around, but only once
+[.] (S) Bullets can wrap around, but only once
 [ ] (S) Our own bullets can kill us!
 [ ] (S) When you've won, the spaceship flies off the screen
 [ ] (s) make spaceship respawn in different places
@@ -36,7 +36,8 @@ TODO:
 [ ] (M) 2 players can play at the same time
 [ ] (S) Can't add asteroids after you've won
 [ ] (L) Make a home screen (leaderboard, play, level selection)
-[ ] (L) Package the game for playing sepearately (https://api.arcade.academy/en/latest/tutorials/bundling_with_pyinstaller/index.html)
+[ ] (L) Package the game for playing separately
+        (https://api.arcade.academy/en/latest/tutorials/bundling_with_pyinstaller/index.html)
 [ ] (S) Add bullets used score
 [ ] (L) Make different prize levels
 [ ] (M) Prizes can give different spaceships
@@ -51,19 +52,19 @@ import math
 import arcade
 import os
 
-from typing import cast
+from typing import cast, Optional, List
 
 STARTING_LIVES = 5
 STARTING_ASTEROID_COUNT = 1
 SCALE = 0.5
-OFFSCREEN_SPACE = 0
+OFF_SCREEN_SPACE = 0
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 640
 SCREEN_TITLE = "Asteroid Smasher"
-LEFT_LIMIT = -OFFSCREEN_SPACE
-RIGHT_LIMIT = SCREEN_WIDTH + OFFSCREEN_SPACE
-BOTTOM_LIMIT = -OFFSCREEN_SPACE
-TOP_LIMIT = SCREEN_HEIGHT + OFFSCREEN_SPACE
+LEFT_LIMIT = -OFF_SCREEN_SPACE
+RIGHT_LIMIT = SCREEN_WIDTH + OFF_SCREEN_SPACE
+BOTTOM_LIMIT = -OFF_SCREEN_SPACE
+TOP_LIMIT = SCREEN_HEIGHT + OFF_SCREEN_SPACE
 SPACESHIPS = ["playerShip1_orange", "playerShip2_orange", "playerShip3_orange", "playerShip1_green"]
 NOT_SPLITTING = 0
 SPLITTING = 50
@@ -92,13 +93,13 @@ class TurningSprite(arcade.Sprite):
 
 class ShipSprite(arcade.Sprite):
     """
-    Sprite that represents our space ship.
+    Sprite that represents our spaceship.
 
     Derives from arcade.Sprite.
     """
 
     def __init__(self, filename, scale, game_over_fn, game_won_fn):
-        """ Set up the space ship. """
+        """ Set up the spaceship. """
 
         # Call the parent Sprite constructor
         super().__init__(filename, scale)
@@ -247,6 +248,19 @@ class MyGame(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
+        self.frame_count = 0
+        self.game_over = False
+        self.game_won = False
+        self.paused = False
+        self.all_non_player_sprites_list = arcade.SpriteList()
+        self.asteroid_list = arcade.SpriteList()
+        self.bullet_list = arcade.SpriteList()
+        self.ship_life_list = arcade.SpriteList()
+        self.score = 0
+        self.current_ship = 0
+        self.player_sprite: Optional[ShipSprite] = None
+        self.lives = STARTING_LIVES
+
         # Set the working directory (where we expect to find files) to the same
         # directory this .py file is in. You can leave this out of your own
         # code, but it is needed to easily run the examples using "python -m"
@@ -328,10 +342,10 @@ class MyGame(arcade.Window):
         self.score = 0
         self.current_ship = 0
         self.player_sprite = ShipSprite(
-            f":resources:images/space_shooter/{SPACESHIPS[self.current_ship]}.png"
-            , SCALE
-            , self.is_game_over
-            , self.is_game_won)
+            f":resources:images/space_shooter/{SPACESHIPS[self.current_ship]}.png",
+            SCALE,
+            self.is_game_over,
+            self.is_game_won)
         self.lives = STARTING_LIVES
 
         # Set up the little icons that represent the player lives.
@@ -373,7 +387,8 @@ class MyGame(arcade.Window):
         arcade.draw_text(output, 10, 50, arcade.color.WHITE, 13)
 
         arcade.draw_text(
-            "Keys: Esc=Exit, Enter=New Game, Pause=Pause/Unpause, Space=Shoot, Left/Right=Turn, Up/Down=Move, MouseClick=New Asteroid",
+            "Keys: Esc=Exit, Enter=New Game, Pause=Pause/Unpause, Space=Shoot, Left/Right=Turn, Up/Down=Move, "
+            "MouseClick=New Asteroid",
             400, 5, arcade.color.AERO_BLUE, 13)
 
         self.draw_lazar_bar()
@@ -432,10 +447,11 @@ class MyGame(arcade.Window):
             self.paused = False if self.paused else True
 
         if not self.game_over and not self.paused:
-            # Shoot if the player hit the space bar and we aren't respawning.
-            if (symbol == arcade.key.SPACE and \
-                    not self.player_sprite.respawning and \
-                    self.player_sprite.lazar_capacity == LAZAR_CAPACITY_MAX and \
+            # Shoot if the player hit the space bar, and we aren't respawning.
+            if (
+                    symbol == arcade.key.SPACE and
+                    not self.player_sprite.respawning and
+                    self.player_sprite.lazar_capacity == LAZAR_CAPACITY_MAX and
                     not self.player_sprite.lazar_overheated
             ):
                 self.player_sprite.lazar_heat += LAZAR_HEAT_RATE
@@ -598,17 +614,20 @@ class MyGame(arcade.Window):
                 bullet.remove_from_sprite_lists()
 
     def process_asteroids_colliding_with_asteroids(self):
-        asteroids_to_split: AsteroidSprite = []
+        asteroids_to_split: List[AsteroidSprite] = []
+
         for asteroid in self.asteroid_list:
             collided = False
-            asteroids_colliding = arcade.check_for_collision_with_list(asteroid, self.asteroid_list)
+            asteroids_colliding: List[AsteroidSprite] = arcade.check_for_collision_with_list(asteroid,
+                                                                                             self.asteroid_list)
 
             for collision in asteroids_colliding:
-                CHANCE_OF_COLLISION = random.randint(0, ASTEROID_COLLISION_RATE_RANGE)
-                if (collision != asteroid and
+                chance_of_collision = random.randint(0, ASTEROID_COLLISION_RATE_RANGE)
+                if (
+                        collision != asteroid and
                         collision.splitting == NOT_SPLITTING and
                         asteroid.splitting == NOT_SPLITTING and
-                        CHANCE_OF_COLLISION < ASTEROID_COLLISION_THRESHOLD
+                        chance_of_collision < ASTEROID_COLLISION_THRESHOLD
                 ):
                     if collision.size > 1:
                         asteroids_to_split.append(collision)
@@ -625,7 +644,7 @@ class MyGame(arcade.Window):
             self.split_asteroid(cast(AsteroidSprite, asteroid))  # expected AsteroidSprite, got Sprite instead
             asteroid.remove_from_sprite_lists()
 
-    def on_update(self, x):
+    def on_update(self, _):
         """ Move everything """
 
         if self.paused:
@@ -652,17 +671,17 @@ class MyGame(arcade.Window):
         self.process_asteroids_colliding_with_player()
 
     def process_asteroids_colliding_with_player(self):
-        asteroidDamage = arcade.check_for_collision_with_list(self.player_sprite, self.asteroid_list)
+        asteroid_damage = arcade.check_for_collision_with_list(self.player_sprite, self.asteroid_list)
 
-        if len(asteroidDamage) == 0:
+        if len(asteroid_damage) == 0:
             return
 
         if self.lives > 0:
             self.lives -= 1
             self.current_ship += 1
             self.player_sprite.respawn()
-            self.split_asteroid(cast(AsteroidSprite, asteroidDamage[0]))
-            asteroidDamage[0].remove_from_sprite_lists()
+            self.split_asteroid(cast(AsteroidSprite, asteroid_damage[0]))
+            asteroid_damage[0].remove_from_sprite_lists()
             self.ship_life_list.pop().remove_from_sprite_lists()
             print("Crash")
         else:
