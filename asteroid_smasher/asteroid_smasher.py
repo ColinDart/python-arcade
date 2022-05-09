@@ -26,7 +26,7 @@ TODO:
 [ ] (M)** Ask "Do you want to restart?" when Enter is pressed
 [ ] (S) Prevent mouse from creating too many asteroids
 [ ] (S) Prevent mouse from creating asteroids too close to player
-[.] (S) Bullets can wrap around, but only once
+[X] (S) Bullets can wrap around, but only once
 [ ] (S) Our own bullets can kill us!
 [ ] (S) When you've won, the spaceship flies off the screen
 [ ] (s) make spaceship respawn in different places
@@ -46,6 +46,9 @@ TODO:
 [ ] (M) Split into different files
 [ ] (M) Add instructions
 [ ] (S) Change asteroid colour or sound as they get closer
+[ ] (S) Add a key press to fire a wrap around bullet
+[ ] (M) Add a counter on screen to show how many wrap-around bullets are left
+[ ] (S) Different bullet colour for wrap-around bullets
 """
 import random
 import math
@@ -82,6 +85,8 @@ LAZAR_CAPACITY_MAX = 200
 MAX_SOLID = 255
 ASTEROID_COLLISION_RATE_RANGE = 10000
 ASTEROID_COLLISION_THRESHOLD = 10
+MAX_BULLET_WRAPS = 1
+
 
 class TurningSprite(arcade.Sprite):
     """ Sprite that sets its angle to the direction it is traveling in. """
@@ -235,11 +240,29 @@ class BulletSprite(TurningSprite):
     that aligns to its direction.
     """
 
+    def __init__(self, *args, **kwargs):
+        self.wraps_remaining = MAX_BULLET_WRAPS
+        super().__init__(*args, **kwargs)
+
     def update(self):
         super().update()
-        if self.center_x < -100 or self.center_x > 1500 or \
-                self.center_y > 1100 or self.center_y < -100:
+        if LEFT_LIMIT < self.center_x < RIGHT_LIMIT and \
+                BOTTOM_LIMIT < self.center_y < TOP_LIMIT:
+            return
+
+        if self.wraps_remaining <= 0:
             self.remove_from_sprite_lists()
+            return
+
+        self.wraps_remaining = self.wraps_remaining - 1
+        if self.center_x < LEFT_LIMIT:
+            self.center_x = RIGHT_LIMIT
+        if self.center_x > RIGHT_LIMIT:
+            self.center_x = LEFT_LIMIT
+        if self.center_y > TOP_LIMIT:
+            self.center_y = BOTTOM_LIMIT
+        if self.center_y < BOTTOM_LIMIT:
+            self.center_y = TOP_LIMIT
 
 
 class MyGame(arcade.Window):
