@@ -10,7 +10,7 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
 # Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 1
+CHARACTER_SCALING = 0.40
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 128
