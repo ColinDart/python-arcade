@@ -66,7 +66,7 @@ class MyGame(arcade.Window):
         self.camera_gui = arcade.Camera(self.width, self.height)
 
         # Name of map file to load
-        map_name = ":resources:tiled_maps/map.json"
+        map_name = "./level1.tmx"
 
         # Layer specific options are defined based on Layer names in a dictionary
         # Doing this will make the SpriteList for the platforms layer
