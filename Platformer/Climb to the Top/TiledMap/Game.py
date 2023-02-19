@@ -10,7 +10,7 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 
 # Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 0.40
+CHARACTER_SCALING = 0.36
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 128
@@ -19,7 +19,7 @@ GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 5
 GRAVITY = 0.7
-PLAYER_JUMP_SPEED = 10
+PLAYER_JUMP_SPEED = 11
 
 
 class MyGame(arcade.Window):
