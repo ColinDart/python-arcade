@@ -59,8 +59,12 @@ class MyGame(arcade.Window):
         self.left_key_down = False
         self.right_key_down = False
 
+        self.game_over = False
+
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
+
+        self.game_over = False
 
         # Set up the Cameras
         self.camera_sprites = arcade.Camera(self.width, self.height)
@@ -130,6 +134,11 @@ class MyGame(arcade.Window):
                          color=arcade.csscolor.WHITE,
                          font_size=18)
 
+        if self.game_over:
+            arcade.draw_text("GAME OVER!", 500, 300,
+                             arcade.color.YELLOW, 50, align="left", anchor_x="center",
+                             anchor_y="center", rotation=8)
+
     def update_player_speed(self):
 
         # Calculate speed based on the keys pressed
@@ -191,6 +200,9 @@ class MyGame(arcade.Window):
     def on_update(self, delta_time):
         """Movement and game logic"""
 
+        if self.game_over:
+            return
+
         # Move the player with the physics engine
         self.physics_engine.update()
 
@@ -218,13 +230,19 @@ class MyGame(arcade.Window):
             # Add one to the score
             self.keys += 1
 
+        if self.player_sprite.center_y <= 0:
+            self.game_over = True
+
         # Position the camera
         self.center_camera_to_player()
 
     def on_resize(self, width, height):
+        new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
+        new_height = height if height <= SCREEN_HEIGHT else SCREEN_HEIGHT
+
         """ Resize window """
-        self.camera_sprites.resize(int(width), int(height))
-        self.camera_gui.resize(int(width), int(height))
+        self.camera_sprites.resize(int(new_width), int(new_height))
+        self.camera_gui.resize(int(new_width), int(new_height))
 
 
 def main():
