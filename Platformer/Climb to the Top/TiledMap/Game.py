@@ -62,7 +62,7 @@ class MyGame(arcade.Window):
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
 
-        # Setup the Cameras
+        # Set up the Cameras
         self.camera_sprites = arcade.Camera(self.width, self.height)
         self.camera_gui = arcade.Camera(self.width, self.height)
 
@@ -91,11 +91,12 @@ class MyGame(arcade.Window):
 
         # Keep track of the score
         self.score = 0
+        self.keys = 0
 
         # Set up the player, specifically placing it at these coordinates.
         src = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
         self.player_sprite = arcade.Sprite(src, CHARACTER_SCALING)
-        self.player_sprite.center_x = 128
+        self.player_sprite.center_x = 18
         self.player_sprite.center_y = 128
         self.scene.add_sprite("Player", self.player_sprite)
 
@@ -157,6 +158,12 @@ class MyGame(arcade.Window):
             self.right_key_down = True
             self.update_player_speed()
 
+        elif key == arcade.key.ESCAPE:
+            self.close()
+
+        elif key == arcade.key.ENTER:
+            self.setup()
+
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
         if key == arcade.key.LEFT or key == arcade.key.A:
@@ -165,8 +172,6 @@ class MyGame(arcade.Window):
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_key_down = False
             self.update_player_speed()
-        elif key == arcade.key.ESCAPE:
-            self.close()
 
     def center_camera_to_player(self):
         # Find where player is, then calculate lower left corner from that
