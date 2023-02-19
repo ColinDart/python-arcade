@@ -53,6 +53,7 @@ class MyGame(arcade.Window):
 
         # Keep track of the score
         self.score = 0
+        self.keys = 0
 
         # What key is pressed down?
         self.left_key_down = False
@@ -199,6 +200,18 @@ class MyGame(arcade.Window):
             coin.remove_from_sprite_lists()
             # Add one to the score
             self.score += 1
+
+        # See if we hit any coins
+        key_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene["Keys"]
+        )
+
+        # Loop through each coin we hit (if any) and remove it
+        for key in key_hit_list:
+            # Remove the coin
+            key.remove_from_sprite_lists()
+            # Add one to the score
+            self.keys += 1
 
         # Position the camera
         self.center_camera_to_player()
