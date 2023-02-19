@@ -10,7 +10,7 @@
     "fileStates": {
         "BasePack_Items.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1
+            "scaleInDock": 0.33
         },
         "BasePack_Items_spritesheet.tsx": {
             "scaleInDock": 0.75,
@@ -18,7 +18,7 @@
         },
         "BasePack_Tiles.tsx": {
             "dynamicWrapping": true,
-            "scaleInDock": 1,
+            "scaleInDock": 0.33,
             "scaleInEditor": 1
         },
         "BasePack_Tiles_spritesheet.tsx": {
@@ -31,7 +31,7 @@
         },
         "Grass.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 0.5
+            "scaleInDock": 0.33
         },
         "level1.tmj": {
             "scale": 0.25,
@@ -42,11 +42,11 @@
             }
         },
         "level1.tmx": {
-            "scale": 0.24292857142857144,
-            "selectedLayer": 0,
+            "scale": 0.25,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 1051.7494854454571,
-                "y": 1751.5436636283443
+                "x": 1050,
+                "y": 1746
             }
         }
     },
