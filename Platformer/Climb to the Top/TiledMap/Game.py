@@ -65,6 +65,7 @@ class MyGame(arcade.Window):
         """Set up the game here. Call this function to restart the game."""
 
         self.game_over = False
+        arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
         # Set up the Cameras
         self.camera_sprites = arcade.Camera(self.width, self.height)
