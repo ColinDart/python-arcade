@@ -142,7 +142,7 @@ class MyGame(arcade.Window):
         """Called whenever a key is pressed."""
 
         # Jump
-        if key == arcade.key.UP or key == arcade.key.W:
+        if key == arcade.key.UP or key == arcade.key.W or key == arcade.key.SPACE:
             if self.physics_engine.can_jump():
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
 
@@ -164,6 +164,8 @@ class MyGame(arcade.Window):
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_key_down = False
             self.update_player_speed()
+        elif key == arcade.key.ESCAPE:
+            self.close()
 
     def center_camera_to_player(self):
         # Find where player is, then calculate lower left corner from that
