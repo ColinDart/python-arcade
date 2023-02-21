@@ -25,6 +25,10 @@ PLAYER_START_X = 85
 PLAYER_START_Y = 128
 GAME_OVER_TIMER = 100
 
+YELLOW_KEY = 39
+YELLOW_LOCK = 99
+
+
 class MyGame(arcade.Window):
     """
     Main application class.
@@ -56,7 +60,8 @@ class MyGame(arcade.Window):
 
         # Keep track of the score
         self.score = 0
-        self.keys = 0
+        self.keys = []
+        self.locks = []
 
         # What key is pressed down?
         self.left_key_down = False
@@ -99,7 +104,8 @@ class MyGame(arcade.Window):
 
         # Keep track of the score
         self.score = 0
-        self.keys = 0
+        self.keys = []
+        self.locks = []
 
         # Set up the player, specifically placing it at these coordinates.
         src = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
@@ -225,17 +231,20 @@ class MyGame(arcade.Window):
             # Add one to the score
             self.score += 1
 
-        # See if we hit any coins
-        key_hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene["Keys"]
+        # See if we hit a yellow key or lock
+        yellow_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene["YellowKeyLock"]
         )
 
         # Loop through each coin we hit (if any) and remove it
-        for key in key_hit_list:
-            # Remove the coin
-            key.remove_from_sprite_lists()
-            # Add one to the score
-            self.keys += 1
+        for yellow in yellow_hit_list:
+            if yellow.properties["tile_id"] == YELLOW_KEY:
+                self.keys.append("yellow")
+                yellow.remove_from_sprite_lists()
+            elif yellow.properties["tile_id"] == YELLOW_LOCK:
+                if "yellow" in self.keys:
+                    self.locks.append("yellow")
+                    yellow.remove_from_sprite_lists()
 
         if self.player_sprite.center_y + (SPRITE_PIXEL_SIZE / 2) <= 0:
             self.game_over = GAME_OVER_TIMER
