@@ -8,6 +8,9 @@
         "."
     ],
     "fileStates": {
+        "Background.tsx": {
+            "dynamicWrapping": true
+        },
         "BasePack_Items.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 0.33
@@ -51,7 +54,7 @@
         }
     },
     "last.externalTilesetPath": "C:/Users/Colin Dart/Downloads/platformer-art-complete-pack-0/Base pack/Tiles",
-    "last.imagePath": "C:/Users/Colin Dart/Downloads/platformer-art-complete-pack-0/Base pack/Items",
+    "last.imagePath": "C:/Users/Colin Dart/Downloads",
     "map.height": 50,
     "map.lastUsedFormat": "json",
     "map.tileHeight": 70,
