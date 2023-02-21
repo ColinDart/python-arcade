@@ -17,10 +17,13 @@ SPRITE_PIXEL_SIZE = 128
 GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5
+PLAYER_MOVEMENT_SPEED = 4
+
 GRAVITY = 0.7
 PLAYER_JUMP_SPEED = 11
-
+PLAYER_START_X = 85
+PLAYER_START_Y = 128
+GAME_OVER_TIMER = 100
 
 class MyGame(arcade.Window):
     """
@@ -59,13 +62,13 @@ class MyGame(arcade.Window):
         self.left_key_down = False
         self.right_key_down = False
 
-        self.game_over = False
+        self.game_over = 0
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
 
-        self.game_over = False
-        arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
+        self.game_over = 0
+        # arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
         # Set up the Cameras
         self.camera_sprites = arcade.Camera(self.width, self.height)
@@ -101,8 +104,8 @@ class MyGame(arcade.Window):
         # Set up the player, specifically placing it at these coordinates.
         src = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
         self.player_sprite = arcade.Sprite(src, CHARACTER_SCALING)
-        self.player_sprite.center_x = 18
-        self.player_sprite.center_y = 128
+        self.player_sprite.center_x = PLAYER_START_X
+        self.player_sprite.center_y = PLAYER_START_Y
         self.scene.add_sprite("Player", self.player_sprite)
 
         # --- Other stuff
@@ -136,7 +139,7 @@ class MyGame(arcade.Window):
                          font_size=18)
 
         if self.game_over:
-            arcade.draw_text("GAME OVER!", 500, 300,
+            arcade.draw_text("OOPS!", 500, 300,
                              arcade.color.YELLOW, 50, align="left", anchor_x="center",
                              anchor_y="center", rotation=8)
 
@@ -202,6 +205,9 @@ class MyGame(arcade.Window):
         """Movement and game logic"""
 
         if self.game_over:
+            self.game_over = self.game_over - 1
+            if self.game_over <= 0:
+                self.setup()
             return
 
         # Move the player with the physics engine
@@ -231,8 +237,8 @@ class MyGame(arcade.Window):
             # Add one to the score
             self.keys += 1
 
-        if self.player_sprite.center_y <= 0:
-            self.game_over = True
+        if self.player_sprite.center_y + (SPRITE_PIXEL_SIZE / 2) <= 0:
+            self.game_over = GAME_OVER_TIMER
 
         # Position the camera
         self.center_camera_to_player()
