@@ -3,6 +3,20 @@ Platformer Template
 """
 import arcade
 
+BLUE_KEY = 36
+GREEN_KEY = 37
+RED_KEY = 38
+YELLOW_KEY = 39
+BLUE_LOCK = 96
+GREEN_LOCK = 97
+RED_LOCK = 98
+YELLOW_LOCK = 99
+
+KEY_LOCKS = [{"layer": "YellowKeyLock", "key": YELLOW_KEY, "lock": YELLOW_LOCK},
+             {"layer": "BlueKeyLock", "key": BLUE_KEY, "lock": BLUE_LOCK},
+             {"layer": "GreenKeyLock", "key": GREEN_KEY, "lock": GREEN_LOCK},
+             {"layer": "RedKeyLock", "key": RED_KEY, "lock": RED_LOCK}]
+
 # --- Constants
 SCREEN_TITLE = "Platformer"
 
@@ -24,9 +38,6 @@ PLAYER_JUMP_SPEED = 11
 PLAYER_START_X = 85
 PLAYER_START_Y = 128
 GAME_OVER_TIMER = 100
-
-YELLOW_KEY = 39
-YELLOW_LOCK = 99
 
 
 class MyGame(arcade.Window):
@@ -231,26 +242,29 @@ class MyGame(arcade.Window):
             # Add one to the score
             self.score += 1
 
-        # See if we hit a yellow key or lock
-        yellow_hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene["YellowKeyLock"]
-        )
-
-        # Loop through each coin we hit (if any) and remove it
-        for yellow in yellow_hit_list:
-            if yellow.properties["tile_id"] == YELLOW_KEY:
-                self.keys.append("yellow")
-                yellow.remove_from_sprite_lists()
-            elif yellow.properties["tile_id"] == YELLOW_LOCK:
-                if "yellow" in self.keys:
-                    self.locks.append("yellow")
-                    yellow.remove_from_sprite_lists()
+        for key_lock in KEY_LOCKS:
+            self.process_keys_and_locks(key_lock)
 
         if self.player_sprite.center_y + (SPRITE_PIXEL_SIZE / 2) <= 0:
             self.game_over = GAME_OVER_TIMER
 
         # Position the camera
         self.center_camera_to_player()
+
+    def process_keys_and_locks(self, key_lock):
+        # See if we hit a yellow key or lock
+        hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene[key_lock["layer"]]
+        )
+        # Loop through each key or lock we hit (if any) and remove it (if appropriate)
+        for hit in hit_list:
+            if hit.properties["tile_id"] == key_lock["key"]:
+                self.keys.append(key_lock["layer"])
+                hit.remove_from_sprite_lists()
+            elif hit.properties["tile_id"] == key_lock["lock"]:
+                if key_lock["layer"] in self.keys:
+                    self.locks.append(key_lock["layer"])
+                    hit.remove_from_sprite_lists()
 
     def on_resize(self, width, height):
         new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
