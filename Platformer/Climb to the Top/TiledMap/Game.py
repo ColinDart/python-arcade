@@ -275,8 +275,6 @@ class MyGame(arcade.Window):
 
         self.process_springs()
 
-        self.process_doors()
-
         if self.player_sprite.center_y + (SPRITE_PIXEL_SIZE / 2) <= 0:
             self.set_game_over()
 
@@ -331,13 +329,6 @@ class MyGame(arcade.Window):
         for _ in hit_list:
             # Spring the player
             self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO
-
-    def process_doors(self):
-        hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene["LockedDoors"]
-        )
-        for _ in hit_list:
-            print("Door!")
 
     def on_resize(self, width, height):
         new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
