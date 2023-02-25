@@ -2,6 +2,7 @@
 Platformer Template
 """
 import arcade
+from arcade import SpriteList
 
 BLUE_KEY = 36
 GREEN_KEY = 37
@@ -12,13 +13,13 @@ GREEN_LOCK = 97
 RED_LOCK = 98
 YELLOW_LOCK = 99
 
-KEY_LOCKS = [{"layer": "YellowKeyLock", "key": YELLOW_KEY, "lock": YELLOW_LOCK},
-             {"layer": "BlueKeyLock", "key": BLUE_KEY, "lock": BLUE_LOCK},
-             {"layer": "GreenKeyLock", "key": GREEN_KEY, "lock": GREEN_LOCK},
-             {"layer": "RedKeyLock", "key": RED_KEY, "lock": RED_LOCK}]
+KEY_LOCKS = [{"layer": "YellowKeyLocks", "key": YELLOW_KEY, "lock": YELLOW_LOCK},
+             {"layer": "BlueKeyLocks", "key": BLUE_KEY, "lock": BLUE_LOCK},
+             {"layer": "GreenKeyLocks", "key": GREEN_KEY, "lock": GREEN_LOCK},
+             {"layer": "RedKeyLocks", "key": RED_KEY, "lock": RED_LOCK}]
 
 # --- Constants
-SCREEN_TITLE = "Platformer"
+SCREEN_TITLE = "Climb to the Top"
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
@@ -35,9 +36,13 @@ PLAYER_MOVEMENT_SPEED = 4
 
 GRAVITY = 0.7
 PLAYER_JUMP_SPEED = 11
+SPRING_RATIO = 1.7
 PLAYER_START_X = 85
 PLAYER_START_Y = 128
 GAME_OVER_TIMER = 100
+LEVEL_WON_TIMER = 100
+
+CHEAT = False
 
 
 class MyGame(arcade.Window):
@@ -78,13 +83,26 @@ class MyGame(arcade.Window):
         self.left_key_down = False
         self.right_key_down = False
 
-        self.game_over = 0
+        self.game_over_countdown = 0
+        self.level_won_countdown = 0
+
+    def set_game_over(self):
+        self.game_over_countdown = GAME_OVER_TIMER
+
+    def is_game_over(self):
+        return self.game_over_countdown > 0
+
+    def set_level_won(self):
+        self.level_won_countdown = LEVEL_WON_TIMER
+
+    def is_level_won(self):
+        return self.level_won_countdown > 0
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
 
-        self.game_over = 0
-        # arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
+        self.game_over_countdown = 0
+        self.level_won_countdown = 0
 
         # Set up the Cameras
         self.camera_sprites = arcade.Camera(self.width, self.height)
@@ -118,6 +136,10 @@ class MyGame(arcade.Window):
         self.keys = []
         self.locks = []
 
+        if CHEAT:
+            self.keys = [key_lock for key_lock in KEY_LOCKS]
+            self.locks = [key_lock for key_lock in KEY_LOCKS]
+
         # Set up the player, specifically placing it at these coordinates.
         src = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
         self.player_sprite = arcade.Sprite(src, CHARACTER_SCALING)
@@ -127,8 +149,10 @@ class MyGame(arcade.Window):
 
         # --- Other stuff
         # Create the 'physics engine'
+        barrier_sprites: SpriteList = self.scene["Platforms"]
+        barrier_sprites.extend(self.scene["LockedDoors"])
         self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player_sprite, gravity_constant=GRAVITY, walls=self.scene["Platforms"]
+            self.player_sprite, gravity_constant=GRAVITY, walls=barrier_sprites
         )
 
     def on_draw(self):
@@ -141,7 +165,7 @@ class MyGame(arcade.Window):
         self.camera_sprites.use()
 
         # Draw our Scene
-        # Note, if you a want pixelated look, add pixelated=True to the parameters
+        # Note, if you want a pixelated look, add pixelated=True to the parameters
         self.scene.draw()
 
         # Activate the GUI camera before drawing GUI elements
@@ -155,8 +179,13 @@ class MyGame(arcade.Window):
                          color=arcade.csscolor.WHITE,
                          font_size=18)
 
-        if self.game_over:
+        if self.is_game_over():
             arcade.draw_text("OOPS!", 500, 300,
+                             arcade.color.YELLOW, 50, align="left", anchor_x="center",
+                             anchor_y="center", rotation=8)
+
+        if self.is_level_won():
+            arcade.draw_text("WHOOHOO!", 500, 300,
                              arcade.color.YELLOW, 50, align="left", anchor_x="center",
                              anchor_y="center", rotation=8)
 
@@ -173,26 +202,29 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
 
-        # Jump
-        if key == arcade.key.UP or key == arcade.key.W or key == arcade.key.SPACE:
-            if self.physics_engine.can_jump():
-                self.player_sprite.change_y = PLAYER_JUMP_SPEED
+        match key:
+            case arcade.key.UP | arcade.key.W | arcade.key.SPACE:
+                if self.physics_engine.can_jump():
+                    self.player_sprite.change_y = PLAYER_JUMP_SPEED
+            case arcade.key.LEFT | arcade.key.A:
+                self.left_key_down = True
+                self.update_player_speed()
+            case arcade.key.RIGHT | arcade.key.D:
+                self.right_key_down = True
+                self.update_player_speed()
+            case arcade.key.ESCAPE:
+                self.close()
+            case arcade.key.ENTER:
+                self.setup()
+            case arcade.key.DOWN:
+                # See if we're at an exit
+                hit_list = arcade.check_for_collision_with_list(
+                    self.player_sprite, self.scene["Exits"]
+                )
+                if len(hit_list) > 0:
+                    self.set_level_won()
 
-        # Left
-        elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.left_key_down = True
-            self.update_player_speed()
-
-        # Right
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.right_key_down = True
-            self.update_player_speed()
-
-        elif key == arcade.key.ESCAPE:
-            self.close()
-
-        elif key == arcade.key.ENTER:
-            self.setup()
+            # Remove the coin
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -221,50 +253,91 @@ class MyGame(arcade.Window):
     def on_update(self, delta_time):
         """Movement and game logic"""
 
-        if self.game_over:
-            self.game_over = self.game_over - 1
-            if self.game_over <= 0:
+        if self.is_game_over():
+            self.game_over_countdown = self.game_over_countdown - 1
+            if self.game_over_countdown <= 0:
+                self.setup()
+            return
+
+        if self.is_level_won():
+            self.level_won_countdown = self.level_won_countdown - 1
+            if self.level_won_countdown <= 0:
                 self.setup()
             return
 
         # Move the player with the physics engine
         self.physics_engine.update()
 
-        # See if we hit any coins
-        coin_hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene["Coins"]
-        )
-
-        # Loop through each coin we hit (if any) and remove it
-        for coin in coin_hit_list:
-            # Remove the coin
-            coin.remove_from_sprite_lists()
-            # Add one to the score
-            self.score += 1
+        self.process_coins()
 
         for key_lock in KEY_LOCKS:
             self.process_keys_and_locks(key_lock)
 
+        self.process_springs()
+
+        self.process_doors()
+
         if self.player_sprite.center_y + (SPRITE_PIXEL_SIZE / 2) <= 0:
-            self.game_over = GAME_OVER_TIMER
+            self.set_game_over()
 
         # Position the camera
         self.center_camera_to_player()
+
+    def process_coins(self):
+        # See if we hit any coins
+        hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene["Coins"]
+        )
+        # Loop through each coin we hit (if any) and remove it
+        for hit in hit_list:
+            # Remove the coin
+            hit.remove_from_sprite_lists()
+            # Add one to the score
+            self.score += 1
 
     def process_keys_and_locks(self, key_lock):
         # See if we hit a yellow key or lock
         hit_list = arcade.check_for_collision_with_list(
             self.player_sprite, self.scene[key_lock["layer"]]
         )
-        # Loop through each key or lock we hit (if any) and remove it (if appropriate)
+        # Loop through each key or lock we hit (if any)
         for hit in hit_list:
             if hit.properties["tile_id"] == key_lock["key"]:
+                # Pick up the key
                 self.keys.append(key_lock["layer"])
                 hit.remove_from_sprite_lists()
             elif hit.properties["tile_id"] == key_lock["lock"]:
+                # If we already have the corresponding key...
                 if key_lock["layer"] in self.keys:
+                    # ...unlock it
                     self.locks.append(key_lock["layer"])
                     hit.remove_from_sprite_lists()
+                    # If we've unlocked all the locks...
+                    if len(self.locks) >= len(KEY_LOCKS):
+                        # ... unlock all the doors
+                        door_sprite_list: SpriteList = self.scene['LockedDoors']
+                        doors = [door for door in door_sprite_list.sprite_list]
+                        for door in doors:
+                            # Assume the Tiled map has an open door hidden in a layer behind each locked door.
+                            # So all we need to do is remove the locked door to reveal the unlocked one.
+                            door.remove_from_sprite_lists()
+
+    def process_springs(self):
+        # See if we hit any springs
+        hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene["Springs"]
+        )
+        # Loop through each spring we hit (if any)
+        for _ in hit_list:
+            # Spring the player
+            self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO
+
+    def process_doors(self):
+        hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene["LockedDoors"]
+        )
+        for _ in hit_list:
+            print("Door!")
 
     def on_resize(self, width, height):
         new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
