@@ -3,13 +3,14 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "level1.tmx",
+    "activeFile": "level2.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
         "Background.tsx": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 1
         },
         "BasePack_Items.tsx": {
             "dynamicWrapping": false,
@@ -46,25 +47,36 @@
         },
         "level1.tmx": {
             "scale": 0.25,
+            "selectedLayer": 7,
+            "viewCenter": {
+                "x": 1232,
+                "y": 1746
+            }
+        },
+        "level2.tmx": {
+            "scale": 0.2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1050,
-                "y": 1750
+                "x": 1580,
+                "y": 2707.5
             }
         }
     },
     "last.externalTilesetPath": "C:/Users/Colin Dart/Downloads/platformer-art-complete-pack-0/Base pack/Tiles",
     "last.imagePath": "C:/Users/Colin Dart/Downloads",
-    "map.height": 50,
-    "map.lastUsedFormat": "json",
+    "map.height": 70,
+    "map.lastUsedFormat": "tmx",
     "map.tileHeight": 70,
     "map.tileWidth": 70,
+    "map.width": 45,
     "openFiles": [
-        "level1.tmx"
+        "level1.tmx",
+        "level2.tmx"
     ],
     "project": "ClimbToTheTop.tiled-project",
     "recentFiles": [
         "level1.tmx",
+        "level2.tmx",
         "level1.tmj",
         "BasePack_Tiles.tsx",
         "BasePack_Items_spritesheet.tsx",

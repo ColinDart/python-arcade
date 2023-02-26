@@ -4,6 +4,8 @@ Platformer Template
 import arcade
 from arcade import SpriteList
 
+UNLOCK_DISTANCE = 41
+
 BLUE_KEY = 36
 GREEN_KEY = 37
 RED_KEY = 38
@@ -13,10 +15,7 @@ GREEN_LOCK = 97
 RED_LOCK = 98
 YELLOW_LOCK = 99
 
-KEY_LOCKS = [{"layer": "YellowKeyLocks", "key": YELLOW_KEY, "lock": YELLOW_LOCK},
-             {"layer": "BlueKeyLocks", "key": BLUE_KEY, "lock": BLUE_LOCK},
-             {"layer": "GreenKeyLocks", "key": GREEN_KEY, "lock": GREEN_LOCK},
-             {"layer": "RedKeyLocks", "key": RED_KEY, "lock": RED_LOCK}]
+KEY_LOCK_COLOURS = ["Yellow", "Blue", "Green", "Red"]
 
 # --- Constants
 SCREEN_TITLE = "Climb to the Top"
@@ -32,10 +31,10 @@ SPRITE_PIXEL_SIZE = 128
 GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 4
+PLAYER_MOVEMENT_SPEED = 3
 
-GRAVITY = 0.7
-PLAYER_JUMP_SPEED = 11
+GRAVITY = 0.5
+PLAYER_JUMP_SPEED = 9
 SPRING_RATIO = 1.7
 PLAYER_START_X = 85
 PLAYER_START_Y = 128
@@ -137,8 +136,8 @@ class MyGame(arcade.Window):
         self.locks = []
 
         if CHEAT:
-            self.keys = [key_lock for key_lock in KEY_LOCKS]
-            self.locks = [key_lock for key_lock in KEY_LOCKS]
+            self.keys = [key_lock for key_lock in KEY_LOCK_COLOURS]
+            self.locks = [key_lock for key_lock in KEY_LOCK_COLOURS]
 
         # Set up the player, specifically placing it at these coordinates.
         src = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
@@ -151,6 +150,8 @@ class MyGame(arcade.Window):
         # Create the 'physics engine'
         barrier_sprites: SpriteList = self.scene["Platforms"]
         barrier_sprites.extend(self.scene["LockedDoors"])
+        for colour in KEY_LOCK_COLOURS:
+            barrier_sprites.extend(self.scene[f"{colour}Lock"])
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite, gravity_constant=GRAVITY, walls=barrier_sprites
         )
@@ -270,7 +271,7 @@ class MyGame(arcade.Window):
 
         self.process_coins()
 
-        for key_lock in KEY_LOCKS:
+        for key_lock in KEY_LOCK_COLOURS:
             self.process_keys_and_locks(key_lock)
 
         self.process_springs()
@@ -293,32 +294,39 @@ class MyGame(arcade.Window):
             # Add one to the score
             self.score += 1
 
-    def process_keys_and_locks(self, key_lock):
-        # See if we hit a yellow key or lock
-        hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene[key_lock["layer"]]
+    def process_keys_and_locks(self, colour):
+        # See if we hit the key
+        key_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.scene[f"{colour}Key"]
         )
         # Loop through each key or lock we hit (if any)
-        for hit in hit_list:
-            if hit.properties["tile_id"] == key_lock["key"]:
-                # Pick up the key
-                self.keys.append(key_lock["layer"])
-                hit.remove_from_sprite_lists()
-            elif hit.properties["tile_id"] == key_lock["lock"]:
-                # If we already have the corresponding key...
-                if key_lock["layer"] in self.keys:
-                    # ...unlock it
-                    self.locks.append(key_lock["layer"])
-                    hit.remove_from_sprite_lists()
-                    # If we've unlocked all the locks...
-                    if len(self.locks) >= len(KEY_LOCKS):
-                        # ... unlock all the doors
-                        door_sprite_list: SpriteList = self.scene['LockedDoors']
-                        doors = [door for door in door_sprite_list.sprite_list]
-                        for door in doors:
-                            # Assume the Tiled map has an open door hidden in a layer behind each locked door.
-                            # So all we need to do is remove the locked door to reveal the unlocked one.
-                            door.remove_from_sprite_lists()
+        for key in key_hit_list:
+            # Pick up the key
+            self.keys.append(colour)
+            key.remove_from_sprite_lists()
+
+        # See if we hit the lock
+        closest_lock = arcade.get_closest_sprite(
+            self.player_sprite, self.scene[f"{colour}Lock"]
+        )
+        if not closest_lock:
+            return
+
+        lock, distance = closest_lock
+        # If we're next to the lock, and we already have the corresponding key...
+        if distance <= UNLOCK_DISTANCE and colour in self.keys:
+            # ...unlock it
+            self.locks.append(colour)
+            lock.remove_from_sprite_lists()
+            # If we've unlocked all the locks...
+            if len(self.locks) >= len(KEY_LOCK_COLOURS):
+                # ... unlock all the doors
+                door_sprite_list: SpriteList = self.scene['LockedDoors']
+                doors = [door for door in door_sprite_list.sprite_list]
+                for door in doors:
+                    # Assume the Tiled map has an open door hidden in a layer behind each locked door.
+                    # So all we need to do is remove the locked door to reveal the unlocked one.
+                    door.remove_from_sprite_lists()
 
     def process_springs(self):
         # See if we hit any springs
