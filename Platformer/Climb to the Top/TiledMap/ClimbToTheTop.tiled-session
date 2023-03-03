@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "level2.tmx",
+    "activeFile": "level02.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -37,6 +37,22 @@
             "dynamicWrapping": false,
             "scaleInDock": 0.33
         },
+        "level01.tmx": {
+            "scale": 0.24292857142857144,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1051.7494854454571,
+                "y": 1751.5436636283443
+            }
+        },
+        "level02.tmx": {
+            "scale": 0.25,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1102,
+                "y": 3290
+            }
+        },
         "level1.tmj": {
             "scale": 0.25,
             "selectedLayer": 0,
@@ -57,8 +73,8 @@
             "scale": 0.2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1580,
-                "y": 2707.5
+                "x": 1417.5,
+                "y": 2702.5
             }
         }
     },
@@ -70,13 +86,15 @@
     "map.tileWidth": 70,
     "map.width": 45,
     "openFiles": [
-        "level1.tmx",
-        "level2.tmx"
+        "level01.tmx",
+        "level02.tmx"
     ],
     "project": "ClimbToTheTop.tiled-project",
     "recentFiles": [
-        "level1.tmx",
+        "level02.tmx",
+        "level01.tmx",
         "level2.tmx",
+        "level1.tmx",
         "level1.tmj",
         "BasePack_Tiles.tsx",
         "BasePack_Items_spritesheet.tsx",

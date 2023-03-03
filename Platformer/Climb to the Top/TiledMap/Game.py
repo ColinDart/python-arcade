@@ -1,8 +1,13 @@
 """
 Platformer Template
 """
+from typing import Optional
+
 import arcade
 from arcade import SpriteList
+
+CHEATS = {"startLevel": 2,
+          'keyLocks': True}
 
 UNLOCK_DISTANCE = 41
 
@@ -36,12 +41,10 @@ PLAYER_MOVEMENT_SPEED = 3
 GRAVITY = 0.5
 PLAYER_JUMP_SPEED = 9
 SPRING_RATIO = 1.7
-PLAYER_START_X = 85
-PLAYER_START_Y = 128
+PLAYER_START_X = [85, 50]
+PLAYER_START_Y = [128, 58]
 GAME_OVER_TIMER = 100
 LEVEL_WON_TIMER = 100
-
-CHEAT = False
 
 
 class MyGame(arcade.Window):
@@ -59,7 +62,7 @@ class MyGame(arcade.Window):
         self.tile_map = None
 
         # Our Scene Object
-        self.scene = None
+        self.scene: Optional[arcade.Scene] = None
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -85,6 +88,8 @@ class MyGame(arcade.Window):
         self.game_over_countdown = 0
         self.level_won_countdown = 0
 
+        self.level = 0
+
     def set_game_over(self):
         self.game_over_countdown = GAME_OVER_TIMER
 
@@ -97,9 +102,10 @@ class MyGame(arcade.Window):
     def is_level_won(self):
         return self.level_won_countdown > 0
 
-    def setup(self):
+    def setup(self, level):
         """Set up the game here. Call this function to restart the game."""
 
+        self.level = level if level else 1
         self.game_over_countdown = 0
         self.level_won_countdown = 0
 
@@ -108,7 +114,7 @@ class MyGame(arcade.Window):
         self.camera_gui = arcade.Camera(self.width, self.height)
 
         # Name of map file to load
-        map_name = "./level1.tmx"
+        map_name = f"./level{level:02d}.tmx"
 
         # Layer specific options are defined based on Layer names in a dictionary
         # Doing this will make the SpriteList for the platforms layer
@@ -135,23 +141,28 @@ class MyGame(arcade.Window):
         self.keys = []
         self.locks = []
 
-        if CHEAT:
+        if CHEATS.get('keyLocks'):
             self.keys = [key_lock for key_lock in KEY_LOCK_COLOURS]
             self.locks = [key_lock for key_lock in KEY_LOCK_COLOURS]
 
         # Set up the player, specifically placing it at these coordinates.
         src = ":resources:images/animated_characters/female_adventurer/femaleAdventurer_idle.png"
         self.player_sprite = arcade.Sprite(src, CHARACTER_SCALING)
-        self.player_sprite.center_x = PLAYER_START_X
-        self.player_sprite.center_y = PLAYER_START_Y
+        self.player_sprite.center_x = PLAYER_START_X[level - 1]
+        self.player_sprite.center_y = PLAYER_START_Y[level - 1]
         self.scene.add_sprite("Player", self.player_sprite)
 
         # --- Other stuff
         # Create the 'physics engine'
-        barrier_sprites: SpriteList = self.scene["Platforms"]
-        barrier_sprites.extend(self.scene["LockedDoors"])
+        barrier_sprites: SpriteList = self.get_layer("Platforms")
+        locked_doors = self.get_layer("LockedDoors")
+        if locked_doors:
+            barrier_sprites.extend(locked_doors)
+        green_worms = self.get_layer("GreenWorms")
+        if green_worms:
+            barrier_sprites.extend(green_worms)
         for colour in KEY_LOCK_COLOURS:
-            barrier_sprites.extend(self.scene[f"{colour}Lock"])
+            barrier_sprites.extend(self.get_layer(f"{colour}Lock"))
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite, gravity_constant=GRAVITY, walls=barrier_sprites
         )
@@ -173,7 +184,7 @@ class MyGame(arcade.Window):
         self.camera_gui.use()
 
         # Draw our score on the screen, scrolling it with the viewport
-        score_text = f"Score: {self.score}"
+        score_text = f"Level: {self.level} Score: {self.score}"
         arcade.draw_text(score_text,
                          start_x=10,
                          start_y=10,
@@ -189,6 +200,12 @@ class MyGame(arcade.Window):
             arcade.draw_text("WHOOHOO!", 500, 300,
                              arcade.color.YELLOW, 50, align="left", anchor_x="center",
                              anchor_y="center", rotation=8)
+
+    def get_layer(self, layer_name):
+        try:
+            return self.scene[layer_name]
+        except KeyError:
+            pass
 
     def update_player_speed(self):
 
@@ -219,13 +236,13 @@ class MyGame(arcade.Window):
                 self.setup()
             case arcade.key.DOWN:
                 # See if we're at an exit
-                hit_list = arcade.check_for_collision_with_list(
-                    self.player_sprite, self.scene["Exits"]
-                )
-                if len(hit_list) > 0:
-                    self.set_level_won()
-
-            # Remove the coin
+                exits_layer = self.get_layer("Exits")
+                if exits_layer:
+                    hit_list = arcade.check_for_collision_with_list(
+                        self.player_sprite, exits_layer
+                    )
+                    if len(hit_list) > 0:
+                        self.set_level_won()
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key."""
@@ -263,7 +280,8 @@ class MyGame(arcade.Window):
         if self.is_level_won():
             self.level_won_countdown = self.level_won_countdown - 1
             if self.level_won_countdown <= 0:
-                self.setup()
+                self.level = self.level + 1
+                self.setup(self.level)
             return
 
         # Move the player with the physics engine
@@ -284,8 +302,11 @@ class MyGame(arcade.Window):
 
     def process_coins(self):
         # See if we hit any coins
+        coins_layer = self.get_layer("Coins")
+        if not coins_layer:
+            return
         hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene["Coins"]
+            self.player_sprite, coins_layer
         )
         # Loop through each coin we hit (if any) and remove it
         for hit in hit_list:
@@ -297,7 +318,7 @@ class MyGame(arcade.Window):
     def process_keys_and_locks(self, colour):
         # See if we hit the key
         key_hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene[f"{colour}Key"]
+            self.player_sprite, self.get_layer(f"{colour}Key")
         )
         # Loop through each key or lock we hit (if any)
         for key in key_hit_list:
@@ -307,7 +328,7 @@ class MyGame(arcade.Window):
 
         # See if we hit the lock
         closest_lock = arcade.get_closest_sprite(
-            self.player_sprite, self.scene[f"{colour}Lock"]
+            self.player_sprite, self.get_layer(f"{colour}Lock")
         )
         if not closest_lock:
             return
@@ -321,7 +342,7 @@ class MyGame(arcade.Window):
             # If we've unlocked all the locks...
             if len(self.locks) >= len(KEY_LOCK_COLOURS):
                 # ... unlock all the doors
-                door_sprite_list: SpriteList = self.scene['LockedDoors']
+                door_sprite_list: SpriteList = self.get_layer("LockedDoors")
                 doors = [door for door in door_sprite_list.sprite_list]
                 for door in doors:
                     # Assume the Tiled map has an open door hidden in a layer behind each locked door.
@@ -331,7 +352,7 @@ class MyGame(arcade.Window):
     def process_springs(self):
         # See if we hit any springs
         hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.scene["Springs"]
+            self.player_sprite, self.get_layer("Springs")
         )
         # Loop through each spring we hit (if any)
         for _ in hit_list:
@@ -350,7 +371,7 @@ class MyGame(arcade.Window):
 def main():
     """Main function"""
     window = MyGame()
-    window.setup()
+    window.setup(CHEATS.get('startLevel'))
     arcade.run()
 
 
