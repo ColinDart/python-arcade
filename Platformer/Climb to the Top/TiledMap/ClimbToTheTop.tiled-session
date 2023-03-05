@@ -47,10 +47,10 @@
         },
         "level02.tmx": {
             "scale": 0.2,
-            "selectedLayer": 5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 1570,
-                "y": 2702.5
+                "x": 1565,
+                "y": 2697.5
             }
         },
         "level1.tmj": {

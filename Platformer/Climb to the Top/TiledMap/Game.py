@@ -9,8 +9,8 @@ from arcade import SpriteList
 CHEATS = {'startLevel': 2,
           'restart': 'level',
           'keyLocks': False,
-          'startX': 300,
-          'startY': 500,
+          'startX': None,
+          'startY': None,
           }
 
 UNLOCK_DISTANCE = 41
@@ -44,7 +44,7 @@ PLAYER_MOVEMENT_SPEED = 3
 
 GRAVITY = 0.5
 PLAYER_JUMP_SPEED = 9
-SPRING_RATIO = 1.7
+SPRING_RATIO = [1.7, 2.2]
 PLAYER_START_X = [85, 50]
 PLAYER_START_Y = [128, 58]
 GAME_OVER_TIMER = 70
@@ -372,7 +372,7 @@ class MyGame(arcade.Window):
         # Loop through each spring we hit (if any)
         for _ in hit_list:
             # Spring the player
-            self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO
+            self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO[self.level-1]
 
     def process_buttons(self):
         # See if we hit any buttons
@@ -390,16 +390,21 @@ class MyGame(arcade.Window):
                         # So all we need to do is remove the taller green worm to reveal the shorter one.
                         worm.remove_from_sprite_lists()
                 case 7:  # red button
-                    sprites: SpriteList = self.get_layer("RedSprings")
-                    for inactive_spring in sprites.sprite_list:
-                        # Replace the inactive spring with an active one
-                        inactive_spring.remove_from_sprite_lists()
+                    self.activate_springs("Red")
+                case 3:  # blue button
+                    self.activate_springs("Blue")
 
-                        src = "../Assets/Items/springboardUp.png"
-                        active_spring = arcade.Sprite(src, TILE_SCALING)
-                        active_spring.center_x = inactive_spring.center_x
-                        active_spring.center_y = inactive_spring.center_y
-                        self.scene['Springs'].append(active_spring)
+    def activate_springs(self, colour):
+        sprites: SpriteList = self.get_layer(f"{colour}Springs")
+        for inactive_spring in sprites.sprite_list:
+            # Replace the inactive spring with an active one
+            inactive_spring.remove_from_sprite_lists()
+
+            src = "../Assets/Items/springboardUp.png"
+            active_spring = arcade.Sprite(src, TILE_SCALING)
+            active_spring.center_x = inactive_spring.center_x
+            active_spring.center_y = inactive_spring.center_y
+            self.scene['Springs'].append(active_spring)
 
     def on_resize(self, width, height):
         new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
