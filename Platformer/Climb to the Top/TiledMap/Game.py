@@ -6,7 +6,7 @@ from typing import Optional
 import arcade
 from arcade import SpriteList
 
-CHEATS = {'startLevel': 2,
+CHEATS = {'startLevel': 1,
           'restart': 'level',
           'keyLocks': False,
           'startX': None,
@@ -281,7 +281,7 @@ class MyGame(arcade.Window):
         if self.is_game_over():
             self.game_over_countdown = self.game_over_countdown - 1
             if self.game_over_countdown <= 0:
-                self.setup()
+                self.setup(self.level if CHEATS.get('restart') == 'level' else 1)
             return
 
         if self.is_level_won():
@@ -376,8 +376,11 @@ class MyGame(arcade.Window):
 
     def process_buttons(self):
         # See if we hit any buttons
+        buttons = self.get_layer("Buttons")
+        if not buttons:
+            return
         hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.get_layer("Buttons")
+            self.player_sprite, buttons
         )
         # Loop through each button we hit (if any)
         for hit in hit_list:
@@ -418,7 +421,7 @@ class MyGame(arcade.Window):
 def main():
     """Main function"""
     window = MyGame()
-    window.setup(CHEATS.get('startLevel'))
+    window.setup(CHEATS.get('startLevel') if CHEATS.get('startLevel') else 1)
     arcade.run()
 
 
