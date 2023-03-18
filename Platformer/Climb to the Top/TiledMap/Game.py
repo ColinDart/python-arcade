@@ -6,6 +6,17 @@ from typing import Optional
 import arcade
 from arcade import SpriteList
 
+SPRITE_NAME_PLAYER = "Player"
+
+LAYER_NAME_BUTTONS = "Buttons"
+LAYER_NAME_SPRINGS = "Springs"
+LAYER_NAME_LOCKED_DOORS = "LockedDoors"
+LAYER_NAME_EXITS = "Exits"
+LAYER_NAME_SHORT_GREEN_WORMS = "ShortGreenWorms"
+LAYER_NAME_TALL_GREEN_WORMS = "TallGreenWorms"
+LAYER_NAME_COINS = "Coins"
+LAYER_NAME_PLATFORMS = "Platforms"
+
 CHEATS = {'startLevel': 1,
           'restart': 'level',
           'keyLocks': False,
@@ -41,7 +52,6 @@ GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
-
 GRAVITY = 0.5
 PLAYER_JUMP_SPEED = 9
 SPRING_RATIO = [1.7, 2.2]
@@ -124,7 +134,7 @@ class MyGame(arcade.Window):
         # Doing this will make the SpriteList for the platforms layer
         # use spatial hashing for detection.
         layer_options = {
-            "Platforms": {
+            LAYER_NAME_PLATFORMS: {
                 "use_spatial_hash": True,
             },
         }
@@ -154,18 +164,18 @@ class MyGame(arcade.Window):
         self.player_sprite = arcade.Sprite(src, CHARACTER_SCALING)
         self.player_sprite.center_x = CHEATS.get('startX') if CHEATS.get('startX') else PLAYER_START_X[level - 1]
         self.player_sprite.center_y = CHEATS.get('startY') if CHEATS.get('startY') else PLAYER_START_Y[level - 1]
-        self.scene.add_sprite("Player", self.player_sprite)
+        self.scene.add_sprite(SPRITE_NAME_PLAYER, self.player_sprite)
 
         # --- Other stuff
         # Create the 'physics engine'
-        barrier_sprites: SpriteList = self.get_layer("Platforms")
-        locked_doors = self.get_layer("LockedDoors")
+        barrier_sprites: SpriteList = self.get_layer(LAYER_NAME_PLATFORMS)
+        locked_doors = self.get_layer(LAYER_NAME_LOCKED_DOORS)
         if locked_doors:
             barrier_sprites.extend(locked_doors)
-        tall_green_worms = self.get_layer("TallGreenWorms")
+        tall_green_worms = self.get_layer(LAYER_NAME_TALL_GREEN_WORMS)
         if tall_green_worms:
             barrier_sprites.extend(tall_green_worms)
-        short_green_worms = self.get_layer("ShortGreenWorms")
+        short_green_worms = self.get_layer(LAYER_NAME_SHORT_GREEN_WORMS)
         if short_green_worms:
             barrier_sprites.extend(short_green_worms)
         for colour in KEY_LOCK_COLOURS:
@@ -243,7 +253,7 @@ class MyGame(arcade.Window):
                 self.setup(self.level if CHEATS.get('restart') == 'level' else 1)
             case arcade.key.DOWN:
                 # See if we're at an exit
-                exits_layer = self.get_layer("Exits")
+                exits_layer = self.get_layer(LAYER_NAME_EXITS)
                 if exits_layer:
                     hit_list = arcade.check_for_collision_with_list(
                         self.player_sprite, exits_layer
@@ -311,7 +321,7 @@ class MyGame(arcade.Window):
 
     def process_coins(self):
         # See if we hit any coins
-        coins_layer = self.get_layer("Coins")
+        coins_layer = self.get_layer(LAYER_NAME_COINS)
         if not coins_layer:
             return
         hit_list = arcade.check_for_collision_with_list(
@@ -357,7 +367,7 @@ class MyGame(arcade.Window):
             # If we've unlocked all the locks...
             if len(self.locks) >= len(KEY_LOCK_COLOURS):
                 # ... unlock all the doors
-                door_sprite_list: SpriteList = self.get_layer("LockedDoors")
+                door_sprite_list: SpriteList = self.get_layer(LAYER_NAME_LOCKED_DOORS)
                 doors = [door for door in door_sprite_list.sprite_list]
                 for door in doors:
                     # Assume the Tiled map has an open door hidden in a layer behind each locked door.
@@ -367,7 +377,7 @@ class MyGame(arcade.Window):
     def process_springs(self):
         # See if we hit any springs
         hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.get_layer("Springs")
+            self.player_sprite, self.get_layer(LAYER_NAME_SPRINGS)
         )
         # Loop through each spring we hit (if any)
         for _ in hit_list:
@@ -376,7 +386,7 @@ class MyGame(arcade.Window):
 
     def process_buttons(self):
         # See if we hit any buttons
-        buttons = self.get_layer("Buttons")
+        buttons = self.get_layer(LAYER_NAME_BUTTONS)
         if not buttons:
             return
         hit_list = arcade.check_for_collision_with_list(
@@ -387,7 +397,7 @@ class MyGame(arcade.Window):
             hit.remove_from_sprite_lists()
             match hit.properties['tile_id']:
                 case 5:  # green button
-                    sprites: SpriteList = self.get_layer("TallGreenWorms")
+                    sprites: SpriteList = self.get_layer(LAYER_NAME_TALL_GREEN_WORMS)
                     for worm in sprites.sprite_list:
                         # Assume the Tiled map has a shorter green worm in a layer behind each tall green worm.
                         # So all we need to do is remove the taller green worm to reveal the shorter one.
@@ -407,7 +417,7 @@ class MyGame(arcade.Window):
             active_spring = arcade.Sprite(src, TILE_SCALING)
             active_spring.center_x = inactive_spring.center_x
             active_spring.center_y = inactive_spring.center_y
-            self.scene['Springs'].append(active_spring)
+            self.scene[LAYER_NAME_SPRINGS].append(active_spring)
 
     def on_resize(self, width, height):
         new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
