@@ -85,7 +85,7 @@ class MyGame(arcade.Window):
         self.physics_engine = None
 
         # A Camera that can be used for scrolling the screen
-        self.camera_sprites = None
+        self.camera = None
 
         # A non-scrolling camera that can be used to draw GUI elements
         self.camera_gui = None
@@ -124,7 +124,7 @@ class MyGame(arcade.Window):
         self.level_won_countdown = 0
 
         # Set up the Cameras
-        self.camera_sprites = arcade.Camera(self.width, self.height)
+        self.camera = arcade.Camera(self.width, self.height)
         self.camera_gui = arcade.Camera(self.width, self.height)
 
         # Name of map file to load
@@ -191,7 +191,7 @@ class MyGame(arcade.Window):
         self.clear()
 
         # Activate the game camera
-        self.camera_sprites.use()
+        self.camera.use()
 
         # Draw our Scene
         # Note, if you want a pixelated look, add pixelated=True to the parameters
@@ -272,8 +272,8 @@ class MyGame(arcade.Window):
 
     def center_camera_to_player(self):
         # Find where player is, then calculate lower left corner from that
-        screen_center_x = self.player_sprite.center_x - (self.camera_sprites.viewport_width / 2)
-        screen_center_y = self.player_sprite.center_y - (self.camera_sprites.viewport_height / 2)
+        screen_center_x = self.player_sprite.center_x - (self.camera.viewport_width / 2)
+        screen_center_y = self.player_sprite.center_y - (self.camera.viewport_height / 2)
 
         # Set some limits on how far we scroll
         if screen_center_x < 0:
@@ -283,7 +283,7 @@ class MyGame(arcade.Window):
 
         # Here's our center, move to it
         player_centered = screen_center_x, screen_center_y
-        self.camera_sprites.move_to(player_centered)
+        self.camera.move_to(player_centered)
 
     def on_update(self, delta_time):
         """Movement and game logic"""
@@ -424,7 +424,7 @@ class MyGame(arcade.Window):
         new_height = height if height <= SCREEN_HEIGHT else SCREEN_HEIGHT
 
         """ Resize window """
-        self.camera_sprites.resize(int(new_width), int(new_height))
+        self.camera.resize(int(new_width), int(new_height))
         self.camera_gui.resize(int(new_width), int(new_height))
 
 
