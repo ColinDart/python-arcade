@@ -88,7 +88,7 @@ class MyGame(arcade.Window):
         self.camera = None
 
         # A non-scrolling camera that can be used to draw GUI elements
-        self.camera_gui = None
+        self.gui_camera = None
 
         # Keep track of the score
         self.score = 0
@@ -125,7 +125,7 @@ class MyGame(arcade.Window):
 
         # Set up the Cameras
         self.camera = arcade.Camera(self.width, self.height)
-        self.camera_gui = arcade.Camera(self.width, self.height)
+        self.gui_camera = arcade.Camera(self.width, self.height)
 
         # Name of map file to load
         map_name = f"./level{level:02d}.tmx"
@@ -198,7 +198,7 @@ class MyGame(arcade.Window):
         self.scene.draw()
 
         # Activate the GUI camera before drawing GUI elements
-        self.camera_gui.use()
+        self.gui_camera.use()
 
         # Draw our score on the screen, scrolling it with the viewport
         score_text = f"Level: {self.level} Score: {self.score}"
@@ -425,7 +425,7 @@ class MyGame(arcade.Window):
 
         """ Resize window """
         self.camera.resize(int(new_width), int(new_height))
-        self.camera_gui.resize(int(new_width), int(new_height))
+        self.gui_camera.resize(int(new_width), int(new_height))
 
 
 def main():
