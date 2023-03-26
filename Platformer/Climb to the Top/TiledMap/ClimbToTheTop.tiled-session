@@ -37,6 +37,35 @@
             "dynamicWrapping": false,
             "scaleInDock": 0.33
         },
+        "Levels/Background.tsx": {
+            "scaleInDock": 1
+        },
+        "Levels/BasePack_Items.tsx": {
+            "scaleInDock": 1
+        },
+        "Levels/BasePack_Tiles.tsx": {
+            "scaleInDock": 1
+        },
+        "Levels/Grass.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "Levels/level01.tmx": {
+            "scale": 0.16828571428571426,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1054.753820033956,
+                "y": 2570.0339558573855
+            }
+        },
+        "Levels/level02.tmx": {
+            "scale": 0.12020408163265305,
+            "selectedLayer": 11,
+            "viewCenter": {
+                "x": 1576.4855687606114,
+                "y": 3598.04753820034
+            }
+        },
         "level01.tmx": {
             "scale": 0.24292857142857144,
             "selectedLayer": 4,
@@ -49,7 +78,7 @@
             "scale": 0.125,
             "selectedLayer": 12,
             "viewCenter": {
-                "x": 1252,
+                "x": 868,
                 "y": 2068
             }
         },
@@ -78,7 +107,7 @@
             }
         }
     },
-    "last.externalTilesetPath": "C:/Users/Colin Dart/Downloads/platformer-art-complete-pack-0/Base pack/Tiles",
+    "last.externalTilesetPath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/Climb to the Top/TiledMap",
     "last.imagePath": "C:/Users/Colin Dart/Downloads",
     "map.height": 70,
     "map.lastUsedFormat": "tmx",
@@ -91,8 +120,8 @@
     ],
     "project": "ClimbToTheTop.tiled-project",
     "recentFiles": [
-        "level02.tmx",
         "level01.tmx",
+        "level02.tmx",
         "level2.tmx",
         "level1.tmx",
         "level1.tmj",
