@@ -449,7 +449,7 @@ class MyGame(arcade.Window):
                 self.left_pressed = False
             case arcade.key.RIGHT | arcade.key.D:
                 self.right_pressed = False
-            case arcade.key.UP | arcade.key.W:
+            case arcade.key.UP | arcade.key.W | arcade.key.SPACE:
                 self.up_pressed = False
                 self.jump_needs_reset = False
             case arcade.key.DOWN | arcade.key.S:

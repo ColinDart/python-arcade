@@ -39,18 +39,18 @@
         },
         "level01.tmx": {
             "scale": 0.24292857142857144,
-            "selectedLayer": 2,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1175.2425757130254,
+                "x": 1051.7494854454571,
                 "y": 1751.5436636283443
             }
         },
         "level02.tmx": {
-            "scale": 0.2,
-            "selectedLayer": 2,
+            "scale": 0.125,
+            "selectedLayer": 12,
             "viewCenter": {
-                "x": 1377.5,
-                "y": 2692.5
+                "x": 1252,
+                "y": 2068
             }
         },
         "level1.tmj": {
