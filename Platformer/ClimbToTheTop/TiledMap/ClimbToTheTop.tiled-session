@@ -5,8 +5,8 @@
     },
     "activeFile": "Levels/level01.tmx",
     "expandedProjectPaths": [
-        ".",
         "TileSets",
+        ".",
         "Levels"
     ],
     "fileStates": {
@@ -58,8 +58,8 @@
             "scale": 0.24292857142857144,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1053.8077036165835,
-                "y": 1751.5436636283443
+                "x": 1057.9241399588357,
+                "y": 1784.4751543663626
             }
         },
         "Levels/level02.tmx": {
@@ -134,31 +134,28 @@
             }
         }
     },
-    "last.externalTilesetPath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/Climb to the Top/TiledMap/TileSets",
-    "last.imagePath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/Climb to the Top/TiledMap/TileSets/Tiles/platformer-extendedtiles-0/PNG Grass/Spritesheet",
+    "last.externalTilesetPath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/ClimbToTheTop/TiledMap/TileSets",
+    "last.imagePath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/ClimbToTheTop/TiledMap/TileSets/Tiles/platformer-extendedtiles-0/PNG Grass/Spritesheet",
     "map.height": 70,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 70,
     "map.tileWidth": 70,
     "map.width": 45,
     "openFiles": [
-        "Levels/level01.tmx",
-        "Levels/level02.tmx"
+        "Levels/level01.tmx"
     ],
     "project": "ClimbToTheTop.tiled-project",
     "recentFiles": [
-        "Levels/level02.tmx",
         "Levels/level01.tmx",
-        "TileSets/Grass.tsx",
-        "TileSets/BasePack_Tiles.tsx",
-        "BasePack_Items.tsx",
-        "BasePack_Tiles.tsx",
-        "TileSets/BasePack_Items.tsx",
-        "TileSets/Background.tsx",
-        "Background.tsx",
         "level01.tmx",
         "level02.tmx",
-        "level2.tmx"
+        "level2.tmx",
+        "level1.tmx",
+        "level1.tmj",
+        "BasePack_Tiles.tsx",
+        "BasePack_Items_spritesheet.tsx",
+        "BasePack_Tiles_spritesheet.tsx",
+        "BasePack_spritesheet.tsx"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",
