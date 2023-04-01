@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="30" height="50" tilewidth="70" tileheight="70" infinite="0" backgroundcolor="#6495f7" nextlayerid="17" nextobjectid="1">
- <tileset firstgid="1" source="../Grass.tsx"/>
- <tileset firstgid="50" source="../BasePack_Tiles.tsx"/>
- <tileset firstgid="222" source="../BasePack_Items.tsx"/>
- <tileset firstgid="281" source="../Background.tsx"/>
+ <tileset firstgid="1" source="../TileSets/Grass.tsx"/>
+ <tileset firstgid="50" source="../TileSets/BasePack_Tiles.tsx"/>
+ <tileset firstgid="222" source="../TileSets/BasePack_Items.tsx"/>
+ <tileset firstgid="281" source="../TileSets/Background.tsx"/>
  <layer id="3" name="PlatformBackground" width="30" height="50">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,111,0,0,0,0,0,0,0,

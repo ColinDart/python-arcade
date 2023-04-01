@@ -20,7 +20,7 @@ LAYER_NAME_COINS = "Coins"
 LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_PLATFORMS = "Platforms"
 
-CHEATS = {'startLevel': 2,
+CHEATS = {'startLevel': 1,
           'restart': 'level',
           'keyLocks': False,
           'startX': None,

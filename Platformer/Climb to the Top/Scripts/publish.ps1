@@ -1,0 +1,1 @@
+pyinstaller Game.py --add-data "TiledMap\Levels;.\TiledMap\Levels"  --add-data "TiledMap\TileSets;.\TiledMap\TileSets"
