@@ -8,4 +8,4 @@ Template for side-scrolling platformer from [here](https://api.arcade.academy/en
 
 ## "Climb to the Top" platform game
 
-Lewis' first platform game, created as a Special Interest Area (SIA) project for Cub Scouts to get his Grey Wolf badge.
+[Climb to the Top](./ClimbToTheTop) is Lewis' first platform game, created as a Special Interest Area (SIA) project for Cub Scouts to get his Grey Wolf badge.
