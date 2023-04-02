@@ -4,4 +4,4 @@ Lewis' first platform game, created as a Special Interest Area (SIA) project for
 
 Artwork from http://kenney.nl
 
-Download to play: [Climb To The Top](https://github.com/ColinDart/python-arcade/raw/master/Platformer/ClimbToTheTop/dist/Game.exe)
+Click to download and play: [Climb To The Top](https://github.com/ColinDart/python-arcade/raw/master/Platformer/ClimbToTheTop/dist/Game.exe)
