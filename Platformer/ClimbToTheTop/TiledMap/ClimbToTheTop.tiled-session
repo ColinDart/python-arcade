@@ -64,7 +64,7 @@
         },
         "Levels/level02.tmx": {
             "scale": 0.1735204081632653,
-            "selectedLayer": 11,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 1579.0649808879743,
                 "y": 2452.1611290796823
@@ -146,6 +146,7 @@
     ],
     "project": "ClimbToTheTop.tiled-project",
     "recentFiles": [
+        "Levels/level02.tmx",
         "Levels/level01.tmx",
         "level01.tmx",
         "level02.tmx",
