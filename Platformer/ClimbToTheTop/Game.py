@@ -6,6 +6,7 @@ import os
 import arcade
 from arcade import SpriteList
 
+
 # Dynamic Layers
 LAYER_NAME_PLAYER = "Player"
 
@@ -13,6 +14,7 @@ LAYER_NAME_PLAYER = "Player"
 LAYER_NAME_BUTTONS = "Buttons"
 LAYER_NAME_SPRINGS = "Springs"
 LAYER_NAME_LOCKED_DOORS = "LockedDoors"
+LAYER_NAME_DOOR_PAIR = "DoorPair"
 LAYER_NAME_EXITS = "Exits"
 LAYER_NAME_SHORT_GREEN_WORMS = "ShortGreenWorms"
 LAYER_NAME_TALL_GREEN_WORMS = "TallGreenWorms"
@@ -20,12 +22,14 @@ LAYER_NAME_COINS = "Coins"
 LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_PLATFORMS = "Platforms"
 
-CHEATS = {'startLevel': 1,
+CHEATS = {'startLevel': 2,
           'restart': 'level',
-          'keyLocks': False,
-          'startX': None,
-          'startY': None,
+          'keyLocks': True,
+          'startX': 800,
+          'startY': 1400,
           }
+
+LAST_LEVEL_NUMBER = 2
 
 UNLOCK_DISTANCE = 41
 
@@ -37,6 +41,7 @@ BLUE_LOCK = 96
 GREEN_LOCK = 97
 RED_LOCK = 98
 YELLOW_LOCK = 99
+DOOR_BOTTOM_SECTION = 60
 
 KEY_LOCK_COLOURS = ["Yellow", "Blue", "Green", "Red"]
 
@@ -217,7 +222,6 @@ class MyGame(arcade.Window):
         self.keys = []
         self.locks = []
 
-
         self.game_over_countdown = 0
         self.level_won_countdown = 0
         self.level = 0
@@ -263,6 +267,13 @@ class MyGame(arcade.Window):
                 "use_spatial_hash": True,
             },
             LAYER_NAME_LOCKED_DOORS: {
+                "use_spatial_hash": True,
+            },
+            # Only optimising using spatial hash for first 2 door pairs
+            f"{LAYER_NAME_DOOR_PAIR}1": {
+                "use_spatial_hash": True,
+            },
+            f"{LAYER_NAME_DOOR_PAIR}2": {
                 "use_spatial_hash": True,
             },
             LAYER_NAME_EXITS: {
@@ -390,8 +401,8 @@ class MyGame(arcade.Window):
             if self.physics_engine.is_on_ladder():
                 self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
             elif (
-                self.physics_engine.can_jump(y_distance=10)
-                and not self.jump_needs_reset
+                    self.physics_engine.can_jump(y_distance=10)
+                    and not self.jump_needs_reset
             ):
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
                 self.jump_needs_reset = True
@@ -430,14 +441,7 @@ class MyGame(arcade.Window):
             case arcade.key.ESCAPE:
                 self.close()
             case arcade.key.ENTER:
-                # See if we're at an exit
-                exits_layer = self.get_layer(LAYER_NAME_EXITS)
-                if exits_layer:
-                    hit_list = arcade.check_for_collision_with_list(
-                        self.player_sprite, exits_layer
-                    )
-                    if len(hit_list) > 0:
-                        self.set_level_won()
+                self.process_doors_on_enter()
             case arcade.key.BACKSPACE:
                 self.setup(self.level if CHEATS.get('restart') == 'level' else 1)
         self.process_key_change()
@@ -483,6 +487,8 @@ class MyGame(arcade.Window):
         if self.is_level_won():
             self.level_won_countdown = self.level_won_countdown - 1
             if self.level_won_countdown <= 0:
+                if self.level == LAST_LEVEL_NUMBER:
+                    self.close()
                 self.level = self.level + 1
                 self.setup(self.level)
             return
@@ -581,6 +587,38 @@ class MyGame(arcade.Window):
                         # So all we need to do is remove the locked door to reveal the unlocked one.
                         door.remove_from_sprite_lists()
 
+    def process_doors_on_enter(self):
+        # See if we're at an exit
+        exits_layer = self.get_layer(LAYER_NAME_EXITS)
+        if exits_layer:
+            hit_list = arcade.check_for_collision_with_list(
+                self.player_sprite, exits_layer
+            )
+            if len(hit_list) > 0:
+                self.set_level_won()
+                return
+
+        # See if we're at a door that's in a door pair
+        # Assume up to 2 door pairs
+        for num in range(2):
+            door_pair_layer = self.get_layer(f"{LAYER_NAME_DOOR_PAIR}{num + 1}")
+            if door_pair_layer:
+                hit_list = arcade.check_for_collision_with_list(
+                    self.player_sprite, door_pair_layer
+                )
+                if len(hit_list) == 1:
+                    # Crate a copy of the Door Pair Sprite List
+                    doors = [door for door in door_pair_layer.sprite_list]
+                    # Remove the door (from the copy) that the player has collided with
+                    doors.remove(hit_list[0])
+                    # This should leave only one door left (in the copy) which is the door we want to transport to
+                    for door in doors:
+                        # Ignore top sections of doors (we want to transport to the bottom section)
+                        if door.properties['tile_id'] == DOOR_BOTTOM_SECTION:
+                            # Set the player position to be the position of the bottom section of the door
+                            self.player_sprite.center_x = door.center_x
+                            self.player_sprite.center_y = door.center_y
+
     def process_springs(self):
         # See if we hit any springs
         hit_list = arcade.check_for_collision_with_list(
@@ -589,7 +627,7 @@ class MyGame(arcade.Window):
         # Loop through each spring we hit (if any)
         for _ in hit_list:
             # Spring the player
-            self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO[self.level-1]
+            self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO[self.level - 1]
 
     def process_buttons(self):
         # See if we hit any buttons
