@@ -27,8 +27,8 @@ LAYER_NAME_PLATFORMS = "Platforms"
 CHEATS = {'startLevel': 2,
           'restart': 'level',
           'keyLocks': True,
-          'startX': 200,
-          'startY': 1400,
+          'startX': 350,
+          'startY': 2000,
           }
 
 LAST_LEVEL_NUMBER = 2
@@ -524,9 +524,6 @@ class MyGame(arcade.Window):
         self.scene.update_animation(
             delta_time, [LAYER_NAME_PLAYER]
         )
-
-        # Update walls, used with moving platforms
-        self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
 
         self.process_coins()
 
