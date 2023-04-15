@@ -6,8 +6,8 @@
     "activeFile": "Levels/level01.tmx",
     "expandedProjectPaths": [
         "TileSets",
-        ".",
-        "Levels"
+        "Levels",
+        "."
     ],
     "fileStates": {
         "Background.tsx": {
@@ -146,8 +146,8 @@
     ],
     "project": "ClimbToTheTop.tiled-project",
     "recentFiles": [
-        "Levels/level02.tmx",
         "Levels/level01.tmx",
+        "Levels/level02.tmx",
         "level01.tmx",
         "level02.tmx",
         "level2.tmx",
