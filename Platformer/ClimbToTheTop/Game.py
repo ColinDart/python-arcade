@@ -667,6 +667,8 @@ class MyGame(arcade.Window):
                     self.activate_springs("Red")
                 case 3:  # blue button
                     self.activate_springs("Blue")
+                case 9:  # yellow button
+                    self.deactivate_spikes("Yellow")
 
     def activate_springs(self, colour):
         sprites: SpriteList = self.get_layer(f"{colour}Springs")
@@ -679,6 +681,14 @@ class MyGame(arcade.Window):
             active_spring.center_x = inactive_spring.center_x
             active_spring.center_y = inactive_spring.center_y
             self.scene[LAYER_NAME_SPRINGS].append(active_spring)
+
+    def deactivate_spikes(self, colour):
+        sprites: SpriteList = self.get_layer(f"{colour}Spikes")
+        if sprites:
+            spikes = [spike for spike in sprites.sprite_list]
+            for spike in spikes:
+                # Remove the spike
+                spike.remove_from_sprite_lists()
 
     def on_resize(self, width, height):
         new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
