@@ -26,9 +26,9 @@ LAYER_NAME_PLATFORMS = "Platforms"
 
 CHEATS = {'startLevel': 2,
           'restart': 'level',
-          'keyLocks': True,
-          'startX': 350,
-          'startY': 2000,
+          'keyLocks': False,
+          'startX': 0,
+          'startY': 0,
           }
 
 LAST_LEVEL_NUMBER = 2
