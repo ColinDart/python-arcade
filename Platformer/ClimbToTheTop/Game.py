@@ -20,9 +20,10 @@ LAYER_NAME_SHORT_GREEN_WORMS = "ShortGreenWorms"
 LAYER_NAME_TALL_GREEN_WORMS = "TallGreenWorms"
 LAYER_NAME_COINS = "Coins"
 LAYER_NAME_CHAINS = "Chains"
+LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
 LAYER_NAME_PLATFORMS = "Platforms"
 
-CHEATS = {'startLevel': 1,
+CHEATS = {'startLevel': 2,
           'restart': 'level',
           'keyLocks': False,
           'startX': 0,
@@ -291,6 +292,9 @@ class MyGame(arcade.Window):
             LAYER_NAME_CHAINS: {
                 "use_spatial_hash": True,
             },
+            LAYER_NAME_YELLOW_SPIKES: {
+                "use_spatial_hash": True,
+            },
             LAYER_NAME_PLATFORMS: {
                 "use_spatial_hash": True,
             },
@@ -520,7 +524,7 @@ class MyGame(arcade.Window):
             self.process_keys_and_locks(key_lock)
 
         self.process_springs()
-
+        self.process_spikes()
         self.process_buttons()
 
         if self.player_sprite.center_y + (SPRITE_PIXEL_SIZE / 2) <= 0:
@@ -628,6 +632,14 @@ class MyGame(arcade.Window):
         for _ in hit_list:
             # Spring the player
             self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO[self.level - 1]
+
+    def process_spikes(self):
+        # See if we hit any spikes
+        hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.get_layer(LAYER_NAME_YELLOW_SPIKES)
+        )
+        if len(hit_list) > 0:
+            self.set_game_over()
 
     def process_buttons(self):
         # See if we hit any buttons
