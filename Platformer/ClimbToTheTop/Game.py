@@ -635,8 +635,12 @@ class MyGame(arcade.Window):
 
     def process_spikes(self):
         # See if we hit any spikes
+        yellow_spikes_layer = self.get_layer(LAYER_NAME_YELLOW_SPIKES)
+        if not yellow_spikes_layer:
+            return
+
         hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.get_layer(LAYER_NAME_YELLOW_SPIKES)
+            self.player_sprite, yellow_spikes_layer
         )
         if len(hit_list) > 0:
             self.set_game_over()
