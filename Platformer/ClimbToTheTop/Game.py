@@ -18,8 +18,7 @@ LAYER_NAME_DOOR_PAIR = "DoorPair"
 LAYER_NAME_EXITS = "Exits"
 LAYER_NAME_SHORT_GREEN_WORMS = "ShortGreenWorms"
 LAYER_NAME_TALL_GREEN_WORMS = "TallGreenWorms"
-LAYER_NAME_VERTICAL_PLATFORMS = "VerticalPlatforms"
-LAYER_NAME_HORIZONTAL_PLATFORMS = "HorizontalPlatforms"
+LAYER_NAME_MOVING_PLATFORMS = "MovingPlatforms"
 LAYER_NAME_COINS = "Coins"
 LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
@@ -27,9 +26,9 @@ LAYER_NAME_PLATFORMS = "Platforms"
 
 CHEATS = {'startLevel': 2,
           'restart': 'level',
-          'keyLocks': False,
-          'startX': 0,
-          'startY': 0,
+          'keyLocks': True,
+          'startX': 200,
+          'startY': 1400,
           }
 
 LAST_LEVEL_NUMBER = 2
@@ -297,6 +296,9 @@ class MyGame(arcade.Window):
             LAYER_NAME_YELLOW_SPIKES: {
                 "use_spatial_hash": True,
             },
+            LAYER_NAME_MOVING_PLATFORMS: {
+                "use_spatial_hash": False,
+            },
             LAYER_NAME_PLATFORMS: {
                 "use_spatial_hash": True,
             },
@@ -349,18 +351,13 @@ class MyGame(arcade.Window):
         for colour in KEY_LOCK_COLOURS:
             barrier_sprites.extend(self.get_layer(f"{colour}Lock"))
 
-        vertical_platforms = self.get_layer(LAYER_NAME_VERTICAL_PLATFORMS)
-        if vertical_platforms:
-            barrier_sprites.extend(vertical_platforms)
-
-        horizontal_platforms = self.get_layer(LAYER_NAME_HORIZONTAL_PLATFORMS)
-        if horizontal_platforms:
-            barrier_sprites.extend(horizontal_platforms)
+        moving_platforms = self.get_layer(LAYER_NAME_MOVING_PLATFORMS)
 
         ladder_sprites: SpriteList = self.get_layer(LAYER_NAME_CHAINS)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
+            platforms=moving_platforms,
             gravity_constant=GRAVITY,
             ladders=ladder_sprites,
             walls=barrier_sprites
@@ -527,6 +524,9 @@ class MyGame(arcade.Window):
         self.scene.update_animation(
             delta_time, [LAYER_NAME_PLAYER]
         )
+
+        # Update walls, used with moving platforms
+        self.scene.update([LAYER_NAME_MOVING_PLATFORMS])
 
         self.process_coins()
 
