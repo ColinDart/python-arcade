@@ -31,7 +31,7 @@
             "scale": 0.1300142857142857,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 869.1352598615538,
+                "x": 872.9809910998791,
                 "y": 1003.7358532029448
             }
         },
@@ -44,8 +44,7 @@
             "scaleInDock": 0.5
         },
         "TileSets/ExtendedTiles_Castle.tsx": {
-            "dynamicWrapping": false,
-            "scaleInDock": 1
+            "dynamicWrapping": false
         },
         "TileSets/ExtraAnimationsAndEnemies_AlienYellow.tsx": {
             "dynamicWrapping": true,
