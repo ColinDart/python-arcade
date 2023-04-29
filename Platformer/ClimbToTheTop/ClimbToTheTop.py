@@ -24,7 +24,7 @@ LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
 LAYER_NAME_PLATFORMS = "Platforms"
 
-CHEATS = {'startLevel': 2,
+CHEATS = {'startLevel': 1,
           'restart': 'level',
           'keyLocks': False,
           'startX': 0,
