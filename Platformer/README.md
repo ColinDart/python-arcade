@@ -9,3 +9,7 @@ Template for side-scrolling platformer from [here](https://api.arcade.academy/en
 ## "Climb to the Top" platform game
 
 [Climb to the Top](./ClimbToTheTop) is Lewis' first platform game, created as a Special Interest Area (SIA) project for Cub Scouts to get his Grey Wolf badge.
+
+## "Catch The Bat" platform game
+
+[Catch The Bat](./CatchTheBat) is Fletcher's first platform game, created as a Special Interest Area (SIA) project for Joey Scouts to get his Challenge Award badge.
