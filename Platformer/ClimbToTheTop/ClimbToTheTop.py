@@ -683,7 +683,7 @@ class MyGame(arcade.Window):
             # Replace the inactive spring with an active one
             inactive_spring.remove_from_sprite_lists()
 
-            src = "Assets/Items/springboardUp.png"
+            src = "TiledMap/TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Items/springboardUp.png"
             active_spring = arcade.Sprite(src, TILE_SCALING)
             active_spring.center_x = inactive_spring.center_x
             active_spring.center_y = inactive_spring.center_y

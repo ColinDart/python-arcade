@@ -1,1 +1,1 @@
-pyinstaller Game.py --onefile --add-data "TiledMap\Levels;.\TiledMap\Levels"  --add-data "TiledMap\TileSets;.\TiledMap\TileSets"
+pyinstaller ClimbToTheTop.py --onefile --add-data "TiledMap\Levels;.\TiledMap\Levels"  --add-data "TiledMap\TileSets;.\TiledMap\TileSets"

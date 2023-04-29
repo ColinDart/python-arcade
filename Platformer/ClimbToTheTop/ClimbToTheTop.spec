@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['Game.py'],
+    ['ClimbToTheTop.py'],
     pathex=[],
     binaries=[],
     datas=[('TiledMap\\Levels', '.\\TiledMap\\Levels'), ('TiledMap\\TileSets', '.\\TiledMap\\TileSets')],
@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='Game',
+    name='ClimbToTheTop',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
