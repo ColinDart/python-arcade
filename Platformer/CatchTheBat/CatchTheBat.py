@@ -19,6 +19,7 @@ LAYER_NAME_EXITS = "Exits"
 LAYER_NAME_SHORT_GREEN_WORMS = "ShortGreenWorms"
 LAYER_NAME_TALL_GREEN_WORMS = "TallGreenWorms"
 LAYER_NAME_MOVING_PLATFORMS = "MovingPlatforms"
+LAYER_NAME_MOVING_ANVILS = "MovingAnvils"
 LAYER_NAME_COINS = "Coins"
 LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
@@ -31,7 +32,7 @@ CHEATS = {'startLevel': 1,
           'startY': 0,
           }
 
-LAST_LEVEL_NUMBER = 2
+LAST_LEVEL_NUMBER = 1
 
 UNLOCK_DISTANCE = 41
 
@@ -45,7 +46,7 @@ RED_LOCK = 98
 YELLOW_LOCK = 99
 DOOR_BOTTOM_SECTION = 60
 
-KEY_LOCK_COLOURS = ["Yellow", "Blue", "Green", "Red"]
+KEY_LOCK_COLOURS = ["Red"]
 
 # --- Constants
 SCREEN_TITLE = "Catch the Bat"
@@ -62,7 +63,7 @@ GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
-GRAVITY = 0.5
+GRAVITY = 0.4
 PLAYER_JUMP_SPEED = 9
 SPRING_RATIO = [1.7, 2.2]
 PLAYER_START_X = [85, 50]
@@ -106,7 +107,7 @@ class PlayerCharacter(arcade.Sprite):
         # --- Load Textures ---
 
         # Images from Kenney.nl's Asset Pack 3
-        main_path = ":resources:images/animated_characters/female_adventurer/femaleAdventurer"
+        main_path = ":resources:images/animated_characters/male_person/malePerson"
 
         # Load textures for idle standing
         self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
@@ -299,6 +300,9 @@ class MyGame(arcade.Window):
             LAYER_NAME_MOVING_PLATFORMS: {
                 "use_spatial_hash": False,
             },
+            LAYER_NAME_MOVING_ANVILS: {
+                "use_spatial_hash": False,
+            },
             LAYER_NAME_PLATFORMS: {
                 "use_spatial_hash": True,
             },
@@ -351,7 +355,12 @@ class MyGame(arcade.Window):
         for colour in KEY_LOCK_COLOURS:
             barrier_sprites.extend(self.get_layer(f"{colour}Lock"))
 
-        moving_platforms = self.get_layer(LAYER_NAME_MOVING_PLATFORMS)
+        moving_platforms: SpriteList = self.get_layer(LAYER_NAME_MOVING_PLATFORMS)
+        if not moving_platforms:
+            moving_platforms = SpriteList()
+        moving_anvils = self.get_layer(LAYER_NAME_MOVING_ANVILS)
+        if moving_anvils:
+            moving_platforms.extend(moving_anvils)
 
         ladder_sprites: SpriteList = self.get_layer(LAYER_NAME_CHAINS)
 
@@ -632,13 +641,15 @@ class MyGame(arcade.Window):
 
     def process_springs(self):
         # See if we hit any springs
-        hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.get_layer(LAYER_NAME_SPRINGS)
-        )
-        # Loop through each spring we hit (if any)
-        for _ in hit_list:
-            # Spring the player
-            self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO[self.level - 1]
+        springs_layer = self.get_layer(LAYER_NAME_SPRINGS)
+        if springs_layer:
+            hit_list = arcade.check_for_collision_with_list(
+                self.player_sprite, springs_layer
+            )
+            # Loop through each spring we hit (if any)
+            for _ in hit_list:
+                # Spring the player
+                self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO[self.level - 1]
 
     def process_spikes(self):
         # See if we hit any spikes
