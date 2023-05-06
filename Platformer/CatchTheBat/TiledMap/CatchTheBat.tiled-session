@@ -5,18 +5,18 @@
     },
     "activeFile": "Levels/level01.tmx",
     "expandedProjectPaths": [
-        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Tiles",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack",
-        "TileSets/Tiles/platformer-art-complete-pack-0",
         "TileSets/Tiles/platformer-extendedtiles-0/PNG Castle",
+        "TileSets/Tiles/platformer-extendedtiles-0",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Tiles",
         "TileSets",
-        "Levels",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies/Spritesheets",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies",
-        "TileSets/Tiles",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Items",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack",
         ".",
-        "TileSets/Tiles/platformer-extendedtiles-0"
+        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies/Spritesheets",
+        "Levels",
+        "TileSets/Tiles",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Items",
+        "TileSets/Tiles/platformer-art-complete-pack-0"
     ],
     "fileStates": {
         "Levels/ExtendedTiles_Castle.tsx": {
@@ -28,11 +28,14 @@
             "scaleInEditor": 1
         },
         "Levels/level01.tmx": {
-            "scale": 0.1300142857142857,
-            "selectedLayer": 0,
+            "expandedObjectLayers": [
+                14
+            ],
+            "scale": 0.24,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 872.9809910998791,
-                "y": 1003.7358532029448
+                "x": 1516.6666666666667,
+                "y": 1720.8333333333333
             }
         },
         "TileSets/BasePack_Items.tsx": {
@@ -44,7 +47,8 @@
             "scaleInDock": 0.5
         },
         "TileSets/ExtendedTiles_Castle.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1
         },
         "TileSets/ExtraAnimationsAndEnemies_AlienYellow.tsx": {
             "dynamicWrapping": true,
@@ -59,7 +63,7 @@
     },
     "last.externalTilesetPath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/CatchTheBat/TiledMap/TileSets",
     "last.imagePath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/CatchTheBat/TiledMap/TileSets/Tiles/platformer-extendedtiles-0/PNG Castle/Spritesheet",
-    "map.height": 30,
+    "map.height": 50,
     "map.lastUsedFormat": "tmx",
     "map.renderOrder": null,
     "map.tileHeight": 70,

@@ -20,10 +20,12 @@ LAYER_NAME_SHORT_GREEN_WORMS = "ShortGreenWorms"
 LAYER_NAME_TALL_GREEN_WORMS = "TallGreenWorms"
 LAYER_NAME_MOVING_PLATFORMS = "MovingPlatforms"
 LAYER_NAME_MOVING_ANVILS = "MovingAnvils"
+LAYER_NAME_MOVING_CHAINS = "MovingChains"
 LAYER_NAME_COINS = "Coins"
 LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
 LAYER_NAME_PLATFORMS = "Platforms"
+LAYER_NAME_LAVA = "Lava"
 
 CHEATS = {'startLevel': 1,
           'restart': 'level',
@@ -65,6 +67,7 @@ GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 PLAYER_MOVEMENT_SPEED = 3
 GRAVITY = 0.4
 PLAYER_JUMP_SPEED = 9
+LAVA_RATIO = 0.2
 SPRING_RATIO = [1.7, 2.2]
 PLAYER_START_X = [85, 50]
 PLAYER_START_Y = [128, 58]
@@ -303,6 +306,12 @@ class MyGame(arcade.Window):
             LAYER_NAME_MOVING_ANVILS: {
                 "use_spatial_hash": False,
             },
+            LAYER_NAME_MOVING_CHAINS: {
+                "use_spatial_hash": False,
+            },
+            LAYER_NAME_LAVA: {
+                "use_spatial_hash": True,
+            },
             LAYER_NAME_PLATFORMS: {
                 "use_spatial_hash": True,
             },
@@ -539,6 +548,7 @@ class MyGame(arcade.Window):
         for key_lock in KEY_LOCK_COLOURS:
             self.process_keys_and_locks(key_lock)
 
+        self.process_lava()
         self.process_springs()
         self.process_spikes()
         self.process_buttons()
@@ -639,6 +649,19 @@ class MyGame(arcade.Window):
                             self.player_sprite.center_x = door.center_x
                             self.player_sprite.center_y = door.center_y
 
+    def process_lava(self):
+        # See if we hit any lava
+        lava_layer = self.get_layer(LAYER_NAME_LAVA)
+        if lava_layer:
+            hit_list = arcade.check_for_collision_with_list(
+                self.player_sprite, lava_layer
+            )
+            # Loop through each spring we hit (if any)
+            for _ in hit_list:
+                # Spring the player
+                self.player_sprite.change_y = PLAYER_JUMP_SPEED * LAVA_RATIO
+                self.set_game_over()
+
     def process_springs(self):
         # See if we hit any springs
         springs_layer = self.get_layer(LAYER_NAME_SPRINGS)
@@ -709,12 +732,10 @@ class MyGame(arcade.Window):
                 spike.remove_from_sprite_lists()
 
     def on_resize(self, width, height):
-        new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
-        new_height = height if height <= SCREEN_HEIGHT else SCREEN_HEIGHT
-
         """ Resize window """
-        self.camera.resize(int(new_width), int(new_height))
-        self.gui_camera.resize(int(new_width), int(new_height))
+        super().on_resize(width, height)
+        self.camera.resize(int(width), int(height))
+        self.gui_camera.resize(int(width), int(height))
 
 
 def main():
