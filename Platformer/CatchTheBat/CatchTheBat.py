@@ -22,14 +22,17 @@ LAYER_NAME_MOVING_PLATFORMS = "MovingPlatforms"
 LAYER_NAME_MOVING_ANVILS = "MovingAnvils"
 LAYER_NAME_MOVING_CHAINS = "MovingChains"
 LAYER_NAME_COINS = "Coins"
+LAYER_NAME_EMERALDS = "Emeralds"
+LAYER_NAME_ROCKS = "Rocks"
 LAYER_NAME_CHAINS = "Chains"
-LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
+LAYER_NAME_SPIKES = "Spikes"
 LAYER_NAME_PLATFORMS = "Platforms"
 LAYER_NAME_LAVA = "Lava"
 
 CHEATS = {'startLevel': 1,
           'restart': 'level',
           'keyLocks': False,
+          'emeralds': False,
           'startX': 0,
           'startY': 0,
           }
@@ -225,8 +228,9 @@ class MyGame(arcade.Window):
 
         # Keep track of the score
         self.score = 0
-        self.keys = []
-        self.locks = []
+        self.emeralds_to_collect = 0
+        self.keys_collected = []
+        self.locks_unlocked = []
 
         self.game_over_countdown = 0
         self.level_won_countdown = 0
@@ -294,10 +298,13 @@ class MyGame(arcade.Window):
             LAYER_NAME_COINS: {
                 "use_spatial_hash": True,
             },
+            LAYER_NAME_EMERALDS: {
+                "use_spatial_hash": True,
+            },
             LAYER_NAME_CHAINS: {
                 "use_spatial_hash": True,
             },
-            LAYER_NAME_YELLOW_SPIKES: {
+            LAYER_NAME_SPIKES: {
                 "use_spatial_hash": True,
             },
             LAYER_NAME_MOVING_PLATFORMS: {
@@ -324,14 +331,22 @@ class MyGame(arcade.Window):
         # from the map as SpriteLists in the scene in the proper order.
         self.scene = arcade.Scene.from_tilemap(self.tile_map)
 
+        emeralds_layer: SpriteList = self.get_layer(LAYER_NAME_EMERALDS)
+        if emeralds_layer and not CHEATS.get('emeralds'):
+            self.emeralds_to_collect = len(emeralds_layer.sprite_list)
+            print(f'{self.emeralds_to_collect} emeralds to collect')
+
         # Keep track of the score
         self.score = 0
-        self.keys = []
-        self.locks = []
+        self.keys_collected = []
+        self.locks_unlocked = []
+
+        if CHEATS.get('emeralds'):
+            self.emeralds_to_collect = CHEATS.get('emeralds')
 
         if CHEATS.get('keyLocks'):
-            self.keys = [key_lock for key_lock in KEY_LOCK_COLOURS]
-            self.locks = [key_lock for key_lock in KEY_LOCK_COLOURS]
+            self.keys_collected = [key_lock for key_lock in KEY_LOCK_COLOURS]
+            self.locks_unlocked = [key_lock for key_lock in KEY_LOCK_COLOURS]
 
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter()
@@ -543,6 +558,7 @@ class MyGame(arcade.Window):
             delta_time, [LAYER_NAME_PLAYER]
         )
 
+        self.process_emeralds_and_rocks()
         self.process_coins()
 
         for key_lock in KEY_LOCK_COLOURS:
@@ -582,6 +598,30 @@ class MyGame(arcade.Window):
                 case 17:  # gold
                     self.score += 3
 
+    def process_emeralds_and_rocks(self):
+        emeralds_layer: SpriteList = self.get_layer(LAYER_NAME_EMERALDS)
+        if not emeralds_layer:
+            return
+
+        # See if we hit an emerald
+        emerald_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, emeralds_layer
+        )
+        if not emerald_hit_list:
+            return
+
+        # Loop through each emerald we hit (if any)
+        for emerald in emerald_hit_list:
+            # Pick up the emerald
+            self.emeralds_to_collect = self.emeralds_to_collect - 1
+            emerald.remove_from_sprite_lists()
+            if self.emeralds_to_collect == 0:
+                rocks_list = self.get_layer(LAYER_NAME_ROCKS)
+                # Remove the rocks
+                for rock in rocks_list:
+                    rock.remove_from_sprite_lists()
+        print(f'{self.emeralds_to_collect} emeralds to collect')
+
     def process_keys_and_locks(self, colour):
         # See if we hit the key
         key_hit_list = arcade.check_for_collision_with_list(
@@ -590,7 +630,7 @@ class MyGame(arcade.Window):
         # Loop through each key or lock we hit (if any)
         for key in key_hit_list:
             # Pick up the key
-            self.keys.append(colour)
+            self.keys_collected.append(colour)
             key.remove_from_sprite_lists()
 
         # See if we hit the lock
@@ -602,12 +642,12 @@ class MyGame(arcade.Window):
 
         lock, distance = closest_lock
         # If we're next to the lock, and we already have the corresponding key...
-        if distance <= UNLOCK_DISTANCE and colour in self.keys:
+        if distance <= UNLOCK_DISTANCE and colour in self.keys_collected:
             # ...unlock it
-            self.locks.append(colour)
+            self.locks_unlocked.append(colour)
             lock.remove_from_sprite_lists()
             # If we've unlocked all the locks...
-            if len(self.locks) >= len(KEY_LOCK_COLOURS):
+            if len(self.locks_unlocked) >= len(KEY_LOCK_COLOURS):
                 # ... unlock all the doors
                 door_sprite_list: SpriteList = self.get_layer(LAYER_NAME_LOCKED_DOORS)
                 if door_sprite_list:
@@ -676,7 +716,7 @@ class MyGame(arcade.Window):
 
     def process_spikes(self):
         # See if we hit any spikes
-        yellow_spikes_layer = self.get_layer(LAYER_NAME_YELLOW_SPIKES)
+        yellow_spikes_layer = self.get_layer(LAYER_NAME_SPIKES)
         if not yellow_spikes_layer:
             return
 
