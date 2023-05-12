@@ -8,6 +8,18 @@ Artwork from [kenny.nl](http://kenney.nl)
 
 Click to download and play: [ClimbToTheTop.exe](https://github.com/ColinDart/python-arcade/raw/master/Platformer/ClimbToTheTop/dist/ClimbToTheTop.exe)
 
+### How To Play
+
+| Key                            | Function         |
+|--------------------------------|------------------|
+| &larr; (Left arrow)            | Move Left        |
+| &rarr; (Right arrow)           | Move Right       |
+| &uarr; (Up arrow) or Space Bar | Jump or Climb Up |
+| &darr; (Down arrow)            | Climb Down       |
+| Enter                          | Enter a Door     |
+| Escape                         | Close            |
+| Backspace                      | Restart          |
+
 ## Development
 
 ### Package into an executable
