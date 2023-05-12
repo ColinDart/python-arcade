@@ -10,15 +10,15 @@ Artwork from [kenny.nl](http://kenney.nl)
 
 ### How To Play
 
-| Key                           | Function         |
-|-------------------------------|------------------|
-| `&larr;` or `A`               | Move Left        |
-| `&rarr;` or `D`               | Move Right       |
-| `&uarr;` or `W` or `Spacebar` | Jump or Climb Up |
-| `&darr;` or `S`               | Climb Down       |
-| `Enter`                       | Enter a Door     |
-| `Esc`                         | Close            |
-| `Backspace`                   | Restart          |
+| Key                               | Function         |
+|-----------------------------------|------------------|
+| `:arrow_left:` or `A`             | Move Left        |
+| `:arrow_right:` or `D`            | Move Right       |
+| `:arrow_up:` or `W` or `Spacebar` | Jump or Climb Up |
+| `:arrow_down:` or `S`             | Climb Down       |
+| `Enter`                           | Enter a Door     |
+| `Esc`                             | Close            |
+| `Backspace`                       | Restart          |
 
 ## Development
 
