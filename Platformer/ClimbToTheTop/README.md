@@ -6,7 +6,7 @@ Artwork from [kenny.nl](http://kenney.nl)
 
 ## Play the Game!
 
-> Click to download and play: [ClimbToTheTop.exe](https://github.com/ColinDart/python-arcade/raw/master/Platformer/ClimbToTheTop/dist/ClimbToTheTop.exe)
+> Click to download and play: [ClimbToTheTop.exe](https://github.com/ColinDart/python-arcade/raw/master/Platformer/ClimbToTheTop/dist/ClimbToTheTop.exe) :star_struck:
 
 ### How To Play
 
