@@ -2,8 +2,6 @@
 
 Lewis' first platform game, created as a Special Interest Area (SIA) project for Cub Scouts to get his Grey Wolf badge.
 
-Artwork from [kenny.nl](http://kenney.nl)
-
 ## Play the Game!
 
 > Click to download and play: [ClimbToTheTop.exe](https://github.com/ColinDart/python-arcade/raw/master/Platformer/ClimbToTheTop/dist/ClimbToTheTop.exe) :star_struck:
@@ -21,6 +19,8 @@ Artwork from [kenny.nl](http://kenney.nl)
 | `Backspace`                     | Restart          |
 
 ## Development
+
+Artwork from [kenny.nl](http://kenney.nl)
 
 ### Package into an executable
 
