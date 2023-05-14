@@ -37,6 +37,12 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/CatchTheBat/TiledMap/TileSets/ExtendedTiles_Castle.tsx": {
+            "dynamicWrapping": false
+        },
+        "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/CatchTheBat/TiledMap/TileSets/ExtraAnimationsAndEnemies_Enemies.tsx": {
+            "dynamicWrapping": true
+        },
         "Grass.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 0.33
