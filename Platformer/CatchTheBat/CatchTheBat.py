@@ -381,7 +381,9 @@ class MyGame(arcade.Window):
         if short_green_worms:
             barrier_sprites.extend(short_green_worms)
         for colour in KEY_LOCK_COLOURS:
-            barrier_sprites.extend(self.get_layer(f"{colour}Lock"))
+            locks = self.get_layer(f"{colour}Lock")
+            if locks:
+                barrier_sprites.extend(locks)
 
         moving_platforms: SpriteList = self.get_layer(LAYER_NAME_MOVING_PLATFORMS)
         if not moving_platforms:
@@ -631,18 +633,24 @@ class MyGame(arcade.Window):
 
     def process_keys_and_locks(self, colour):
         # See if we hit the key
-        key_hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, self.get_layer(f"{colour}Key")
-        )
-        # Loop through each key or lock we hit (if any)
-        for key in key_hit_list:
-            # Pick up the key
-            self.keys_collected.append(colour)
-            key.remove_from_sprite_lists()
+        keys = self.get_layer(f"{colour}Key")
+        if keys:
+            key_hit_list = arcade.check_for_collision_with_list(
+                self.player_sprite, keys
+            )
+            # Loop through each key or lock we hit (if any)
+            for key in key_hit_list:
+                # Pick up the key
+                self.keys_collected.append(colour)
+                key.remove_from_sprite_lists()
 
         # See if we hit the lock
+        locks = self.get_layer(f"{colour}Lock")
+        if not locks:
+            return
+
         closest_lock = arcade.get_closest_sprite(
-            self.player_sprite, self.get_layer(f"{colour}Lock")
+            self.player_sprite, locks
         )
         if not closest_lock:
             return
