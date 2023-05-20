@@ -6,17 +6,17 @@
     "activeFile": "Levels/level01.tmx",
     "expandedProjectPaths": [
         "TileSets/Tiles/platformer-extendedtiles-0/PNG Castle",
-        "TileSets/Tiles/platformer-extendedtiles-0",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Tiles",
-        "TileSets",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack",
         ".",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies/Spritesheets",
-        "Levels",
-        "TileSets/Tiles",
-        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies",
         "TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Items",
-        "TileSets/Tiles/platformer-art-complete-pack-0"
+        "Levels",
+        "TileSets/Tiles/platformer-art-complete-pack-0",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Base pack/Tiles",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies",
+        "TileSets/Tiles",
+        "TileSets",
+        "TileSets/Tiles/platformer-extendedtiles-0",
+        "TileSets/Tiles/platformer-art-complete-pack-0/Extra animations and enemies/Spritesheets"
     ],
     "fileStates": {
         "Levels/ExtendedTiles_Castle.tsx": {
@@ -31,11 +31,11 @@
             "expandedObjectLayers": [
                 14
             ],
-            "scale": 0.24,
-            "selectedLayer": 4,
+            "scale": 0.24537142857142855,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 1516.6666666666667,
-                "y": 1720.8333333333333
+                "x": 107.99953423381453,
+                "y": 525.7335817419655
             }
         },
         "TileSets/BasePack_Items.tsx": {

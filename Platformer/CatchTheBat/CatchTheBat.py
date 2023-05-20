@@ -369,6 +369,10 @@ class MyGame(arcade.Window):
         if locked_doors:
             barrier_sprites.extend(locked_doors)
 
+        rocks = self.get_layer(LAYER_NAME_ROCKS)
+        if rocks:
+            barrier_sprites.extend(rocks)
+
         tall_green_worms = self.get_layer(LAYER_NAME_TALL_GREEN_WORMS)
         if tall_green_worms:
             barrier_sprites.extend(tall_green_worms)
@@ -385,6 +389,9 @@ class MyGame(arcade.Window):
         moving_anvils = self.get_layer(LAYER_NAME_MOVING_ANVILS)
         if moving_anvils:
             moving_platforms.extend(moving_anvils)
+        moving_chains = self.get_layer(LAYER_NAME_MOVING_CHAINS)
+        if moving_chains:
+            moving_platforms.extend(moving_chains)
 
         ladder_sprites: SpriteList = self.get_layer(LAYER_NAME_CHAINS)
 
