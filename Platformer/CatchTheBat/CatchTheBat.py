@@ -1,11 +1,10 @@
 """
 Catch the Bat
 """
-from typing import Optional
+from typing import Optional, List
 import os
 import arcade
-from arcade import SpriteList
-
+from arcade import SpriteList, Sprite
 
 # Dynamic Layers
 LAYER_NAME_PLAYER = "Player"
@@ -24,7 +23,6 @@ LAYER_NAME_MOVING_CHAINS = "MovingChains"
 LAYER_NAME_COINS = "Coins"
 LAYER_NAME_EMERALDS = "Emeralds"
 LAYER_NAME_ROCKS = "Rocks"
-LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_SPIKES = "Spikes"
 LAYER_NAME_PLATFORMS = "Platforms"
 LAYER_NAME_LAVA = "Lava"
@@ -57,7 +55,7 @@ KEY_LOCK_COLOURS = ["Red"]
 SCREEN_TITLE = "Catch the Bat"
 
 SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 650
+SCREEN_HEIGHT = 1000
 
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 0.36
@@ -68,6 +66,7 @@ GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
 
 # Movement speed of player, in pixels per frame
 PLAYER_MOVEMENT_SPEED = 3
+MOVING_LADDER_SPEED = 5
 GRAVITY = 0.4
 PLAYER_JUMP_SPEED = 9
 LAVA_RATIO = 0.2
@@ -109,6 +108,7 @@ class PlayerCharacter(arcade.Sprite):
         self.jumping = False
         self.climbing = False
         self.is_on_ladder = False
+        self.moving_object_speed = 0
 
         # --- Load Textures ---
 
@@ -154,7 +154,7 @@ class PlayerCharacter(arcade.Sprite):
             self.climbing = True
         if not self.is_on_ladder and self.climbing:
             self.climbing = False
-        if self.climbing and abs(self.change_y) > 1:
+        if self.climbing and abs(self.change_y) > abs(self.moving_object_speed):
             self.cur_texture += 1
             if self.cur_texture > 7:
                 self.cur_texture = 0
@@ -301,9 +301,6 @@ class MyGame(arcade.Window):
             LAYER_NAME_EMERALDS: {
                 "use_spatial_hash": True,
             },
-            LAYER_NAME_CHAINS: {
-                "use_spatial_hash": True,
-            },
             LAYER_NAME_SPIKES: {
                 "use_spatial_hash": True,
             },
@@ -391,11 +388,8 @@ class MyGame(arcade.Window):
         moving_anvils = self.get_layer(LAYER_NAME_MOVING_ANVILS)
         if moving_anvils:
             moving_platforms.extend(moving_anvils)
-        moving_chains = self.get_layer(LAYER_NAME_MOVING_CHAINS)
-        if moving_chains:
-            moving_platforms.extend(moving_chains)
 
-        ladder_sprites: SpriteList = self.get_layer(LAYER_NAME_CHAINS)
+        ladder_sprites: SpriteList = self.get_layer(LAYER_NAME_MOVING_CHAINS)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite,
@@ -467,9 +461,9 @@ class MyGame(arcade.Window):
         # Process up/down when on a ladder and no movement
         if self.physics_engine.is_on_ladder():
             if not self.up_pressed and not self.down_pressed:
-                self.player_sprite.change_y = 0
+                self.player_sprite.change_y = self.player_sprite.moving_object_speed
             elif self.up_pressed and self.down_pressed:
-                self.player_sprite.change_y = 0
+                self.player_sprite.change_y = self.player_sprite.moving_object_speed
 
         # Process left/right
         if self.right_pressed and not self.left_pressed:
@@ -549,6 +543,47 @@ class MyGame(arcade.Window):
         # Move the player with the physics engine
         self.physics_engine.update()
 
+        # Move the other layers with the scene
+        moving_layer_names: List[str] = []
+        moving_layers: SpriteList = SpriteList()
+        moving_chains_layer = self.get_layer(LAYER_NAME_MOVING_CHAINS)
+        if moving_chains_layer:
+            moving_layer_names.append(LAYER_NAME_MOVING_CHAINS)
+            moving_layers.extend(moving_chains_layer)
+
+        if moving_layer_names:
+            self.scene.update(moving_layer_names)
+
+        # See if the moving_object hit a boundary and needs to reverse direction.
+        for moving_object in moving_layers:
+            if (
+                moving_object.boundary_right
+                and moving_object.right > moving_object.boundary_right
+                and moving_object.change_x > 0
+            ):
+                moving_object.change_x *= -1
+
+            if (
+                moving_object.boundary_left
+                and moving_object.left < moving_object.boundary_left
+                and moving_object.change_x < 0
+            ):
+                moving_object.change_x *= -1
+
+            if (
+                moving_object.boundary_top
+                and moving_object.top > moving_object.boundary_top
+                and moving_object.change_y > 0
+            ):
+                moving_object.change_y *= -1
+
+            if (
+                moving_object.boundary_bottom
+                and moving_object.bottom < moving_object.boundary_bottom
+                and moving_object.change_y < 0
+            ):
+                moving_object.change_y *= -1
+
         # Update animations
         if self.physics_engine.can_jump():
             self.player_sprite.can_jump = False
@@ -556,10 +591,21 @@ class MyGame(arcade.Window):
             self.player_sprite.can_jump = True
 
         if self.physics_engine.is_on_ladder() and not self.physics_engine.can_jump():
+            # check if player is on a moving chain
+            moving_chains_layer = self.get_layer(LAYER_NAME_MOVING_CHAINS)
+            if not moving_chains_layer:
+                return
+            moving_chains = arcade.check_for_collision_with_list(
+                self.player_sprite, moving_chains_layer
+            )
+            if len(moving_chains) > 0:
+                self.player_sprite.moving_object_speed = moving_chains[0].change_y
+
             self.player_sprite.is_on_ladder = True
             self.process_key_change()
         else:
             self.player_sprite.is_on_ladder = False
+            self.player_sprite.moving_object_speed = False
             self.process_key_change()
 
         # Update Animations
