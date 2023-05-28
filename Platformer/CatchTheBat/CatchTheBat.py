@@ -446,7 +446,7 @@ class MyGame(arcade.Window):
         # Process up/down
         if self.up_pressed and not self.down_pressed:
             if self.physics_engine.is_on_ladder():
-                self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
+                self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED + self.player_sprite.moving_object_speed
             elif (
                     self.physics_engine.can_jump(y_distance=10)
                     and not self.jump_needs_reset
@@ -456,7 +456,7 @@ class MyGame(arcade.Window):
                 arcade.play_sound(self.jump_sound)
         elif self.down_pressed and not self.up_pressed:
             if self.physics_engine.is_on_ladder():
-                self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+                self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED - self.player_sprite.moving_object_speed
 
         # Process up/down when on a ladder and no movement
         if self.physics_engine.is_on_ladder():

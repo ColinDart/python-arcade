@@ -31,11 +31,11 @@
             "expandedObjectLayers": [
                 14
             ],
-            "scale": 0.24537142857142855,
-            "selectedLayer": 3,
+            "scale": 0.33,
+            "selectedLayer": 8,
             "viewCenter": {
-                "x": 107.99953423381453,
-                "y": 525.7335817419655
+                "x": 457.5757575757576,
+                "y": 456.060606060606
             }
         },
         "TileSets/BasePack_Items.tsx": {
