@@ -446,7 +446,7 @@ class MyGame(arcade.Window):
         # Process up/down
         if self.up_pressed and not self.down_pressed:
             if self.physics_engine.is_on_ladder():
-                self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED + self.player_sprite.moving_object_speed
+                self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED #+ self.player_sprite.moving_object_speed
             elif (
                     self.physics_engine.can_jump(y_distance=10)
                     and not self.jump_needs_reset
@@ -456,14 +456,14 @@ class MyGame(arcade.Window):
                 arcade.play_sound(self.jump_sound)
         elif self.down_pressed and not self.up_pressed:
             if self.physics_engine.is_on_ladder():
-                self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED - self.player_sprite.moving_object_speed
+                self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED #- self.player_sprite.moving_object_speed
 
         # Process up/down when on a ladder and no movement
         if self.physics_engine.is_on_ladder():
             if not self.up_pressed and not self.down_pressed:
-                self.player_sprite.change_y = self.player_sprite.moving_object_speed
+                self.player_sprite.change_y = 0 # self.player_sprite.moving_object_speed
             elif self.up_pressed and self.down_pressed:
-                self.player_sprite.change_y = self.player_sprite.moving_object_speed
+                self.player_sprite.change_y = 0 # self.player_sprite.moving_object_speed
 
         # Process left/right
         if self.right_pressed and not self.left_pressed:
@@ -544,45 +544,45 @@ class MyGame(arcade.Window):
         self.physics_engine.update()
 
         # Move the other layers with the scene
-        moving_layer_names: List[str] = []
-        moving_layers: SpriteList = SpriteList()
-        moving_chains_layer = self.get_layer(LAYER_NAME_MOVING_CHAINS)
-        if moving_chains_layer:
-            moving_layer_names.append(LAYER_NAME_MOVING_CHAINS)
-            moving_layers.extend(moving_chains_layer)
+        # moving_layer_names: List[str] = []
+        # moving_layers: SpriteList = SpriteList()
+        # moving_chains_layer = self.get_layer(LAYER_NAME_MOVING_CHAINS)
+        # if moving_chains_layer:
+        #     moving_layer_names.append(LAYER_NAME_MOVING_CHAINS)
+        #     moving_layers.extend(moving_chains_layer)
 
-        if moving_layer_names:
-            self.scene.update(moving_layer_names)
+        # if moving_layer_names:
+        #     self.scene.update(moving_layer_names)
 
-        # See if the moving_object hit a boundary and needs to reverse direction.
-        for moving_object in moving_layers:
-            if (
-                moving_object.boundary_right
-                and moving_object.right > moving_object.boundary_right
-                and moving_object.change_x > 0
-            ):
-                moving_object.change_x *= -1
-
-            if (
-                moving_object.boundary_left
-                and moving_object.left < moving_object.boundary_left
-                and moving_object.change_x < 0
-            ):
-                moving_object.change_x *= -1
-
-            if (
-                moving_object.boundary_top
-                and moving_object.top > moving_object.boundary_top
-                and moving_object.change_y > 0
-            ):
-                moving_object.change_y *= -1
-
-            if (
-                moving_object.boundary_bottom
-                and moving_object.bottom < moving_object.boundary_bottom
-                and moving_object.change_y < 0
-            ):
-                moving_object.change_y *= -1
+        # # See if the moving_object hit a boundary and needs to reverse direction.
+        # for moving_object in moving_layers:
+        #     if (
+        #         moving_object.boundary_right
+        #         and moving_object.right > moving_object.boundary_right
+        #         and moving_object.change_x > 0
+        #     ):
+        #         moving_object.change_x *= -1
+        #
+        #     if (
+        #         moving_object.boundary_left
+        #         and moving_object.left < moving_object.boundary_left
+        #         and moving_object.change_x < 0
+        #     ):
+        #         moving_object.change_x *= -1
+        #
+        #     if (
+        #         moving_object.boundary_top
+        #         and moving_object.top > moving_object.boundary_top
+        #         and moving_object.change_y > 0
+        #     ):
+        #         moving_object.change_y *= -1
+        #
+        #     if (
+        #         moving_object.boundary_bottom
+        #         and moving_object.bottom < moving_object.boundary_bottom
+        #         and moving_object.change_y < 0
+        #     ):
+        #         moving_object.change_y *= -1
 
         # Update animations
         if self.physics_engine.can_jump():
@@ -592,14 +592,14 @@ class MyGame(arcade.Window):
 
         if self.physics_engine.is_on_ladder() and not self.physics_engine.can_jump():
             # check if player is on a moving chain
-            moving_chains_layer = self.get_layer(LAYER_NAME_MOVING_CHAINS)
-            if not moving_chains_layer:
-                return
-            moving_chains = arcade.check_for_collision_with_list(
-                self.player_sprite, moving_chains_layer
-            )
-            if len(moving_chains) > 0:
-                self.player_sprite.moving_object_speed = moving_chains[0].change_y
+            # moving_chains_layer = self.get_layer(LAYER_NAME_MOVING_CHAINS)
+            # if not moving_chains_layer:
+            #     return
+            # moving_chains = arcade.check_for_collision_with_list(
+            #     self.player_sprite, moving_chains_layer
+            # )
+            # if len(moving_chains) > 0:
+            #     self.player_sprite.moving_object_speed = moving_chains[0].change_y
 
             self.player_sprite.is_on_ladder = True
             self.process_key_change()
