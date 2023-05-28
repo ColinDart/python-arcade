@@ -698,12 +698,9 @@ class MyGame(arcade.Window):
                 spike.remove_from_sprite_lists()
 
     def on_resize(self, width, height):
-        new_width = width if width <= SCREEN_WIDTH else SCREEN_WIDTH
-        new_height = height if height <= SCREEN_HEIGHT else SCREEN_HEIGHT
-
-        """ Resize window """
-        self.camera.resize(int(new_width), int(new_height))
-        self.gui_camera.resize(int(new_width), int(new_height))
+        super().on_resize(width, height)
+        self.camera.resize(int(width), int(height))
+        self.gui_camera.resize(int(width), int(height))
 
 
 def main():
