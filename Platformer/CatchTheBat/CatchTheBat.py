@@ -673,9 +673,9 @@ class MyGame(arcade.Window):
             if self.emeralds_to_collect == 0:
                 rocks_list = self.get_layer(LAYER_NAME_ROCKS)
                 # Remove the rocks
-                for rock in rocks_list:
+                rocks = [rock for rock in rocks_list]
+                for rock in rocks:
                     rock.remove_from_sprite_lists()
-        print(f'{self.emeralds_to_collect} emeralds to collect')
 
     def process_keys_and_locks(self, colour):
         # See if we hit the key
