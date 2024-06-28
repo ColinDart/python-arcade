@@ -330,8 +330,10 @@ class MyGame(arcade.Window):
 
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter()
-        self.player_sprite.center_x = CHEATS.get('startX') if CHEATS.get('startX') else PLAYER_START_X[level - 1]
-        self.player_sprite.center_y = CHEATS.get('startY') if CHEATS.get('startY') else PLAYER_START_Y[level - 1]
+        self.player_sprite.center_x = CHEATS.get('startX') if CHEATS.get('startX') else (
+            PLAYER_START_X[level - 1] if PLAYER_START_X[level - 1] else PLAYER_START_X[0])
+        self.player_sprite.center_y = CHEATS.get('startY') if CHEATS.get('startY') else (
+            PLAYER_START_Y[level - 1] if PLAYER_START_Y[level - 1] else PLAYER_START_Y[0])
         self.scene.add_sprite(LAYER_NAME_PLAYER, self.player_sprite)
 
         # Calculate the right edge of the my_map in pixels
@@ -646,7 +648,8 @@ class MyGame(arcade.Window):
         # Loop through each spring we hit (if any)
         for _ in hit_list:
             # Spring the player
-            self.player_sprite.change_y = PLAYER_JUMP_SPEED * SPRING_RATIO[self.level - 1]
+            self.player_sprite.change_y = PLAYER_JUMP_SPEED * (
+                SPRING_RATIO[self.level - 1] if SPRING_RATIO[self.level - 1] else SPRING_RATIO[0])
 
     def process_spikes(self):
         # See if we hit any spikes
