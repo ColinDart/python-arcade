@@ -71,7 +71,7 @@
         },
         "Levels/level02.tmx": {
             "scale": 0.125,
-            "selectedLayer": 10,
+            "selectedLayer": 13,
             "viewCenter": {
                 "x": 2040,
                 "y": 1464
@@ -82,10 +82,10 @@
         },
         "Levels/level03.tmx": {
             "scale": 0.25,
-            "selectedLayer": 24,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1780,
-                "y": 5384
+                "x": 1776,
+                "y": 5380
             }
         },
         "TileSets/Background.tsx": {
