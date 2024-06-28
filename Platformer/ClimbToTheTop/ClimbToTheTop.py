@@ -50,7 +50,7 @@ DOOR_BOTTOM_SECTION = 60
 
 KEY_LOCK_COLOURS = [["Yellow", "Blue", "Green", "Red"],
                     ["Yellow", "Blue", "Green", "Red"],
-                    ["Yellow"]]
+                    ["Yellow", "Blue"]]
 
 # --- Constants
 SCREEN_TITLE = "Climb to the Top"
