@@ -32,6 +32,7 @@ CHEATS = {'startLevel': 3,
           'keyLocks': False,
           'startX': 0,
           'startY': 0,
+          'showPosition': False
           }
 
 LAST_LEVEL_NUMBER = 3
@@ -391,6 +392,8 @@ class MyGame(arcade.Window):
 
         # Draw our score on the screen, scrolling it with the viewport
         score_text = f"Level: {self.level} Score: {self.score}"
+        if CHEATS.get('showPosition'):
+            score_text = f"{score_text} Position: {round(self.player_sprite.center_x)},{round(self.player_sprite.center_y)}"
         arcade.draw_text(score_text,
                          start_x=10,
                          start_y=10,
