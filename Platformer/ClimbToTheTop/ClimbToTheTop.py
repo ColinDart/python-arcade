@@ -24,14 +24,14 @@ LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
 LAYER_NAME_PLATFORMS = "Platforms"
 
-CHEATS = {'startLevel': 1,
+CHEATS = {'startLevel': 3,
           'restart': 'level',
           'keyLocks': False,
           'startX': 0,
           'startY': 0,
           }
 
-LAST_LEVEL_NUMBER = 2
+LAST_LEVEL_NUMBER = 3
 
 UNLOCK_DISTANCE = 41
 
@@ -45,7 +45,9 @@ RED_LOCK = 98
 YELLOW_LOCK = 99
 DOOR_BOTTOM_SECTION = 60
 
-KEY_LOCK_COLOURS = ["Yellow", "Blue", "Green", "Red"]
+KEY_LOCK_COLOURS = [["Yellow", "Blue", "Green", "Red"],
+                    ["Yellow", "Blue", "Green", "Red"],
+                    ["Yellow"]]
 
 # --- Constants
 SCREEN_TITLE = "Climb to the Top"
@@ -65,8 +67,8 @@ PLAYER_MOVEMENT_SPEED = 3
 GRAVITY = 0.5
 PLAYER_JUMP_SPEED = 9
 SPRING_RATIO = [1.7, 2.2]
-PLAYER_START_X = [85, 50]
-PLAYER_START_Y = [128, 58]
+PLAYER_START_X = [85, 50, 1246]
+PLAYER_START_Y = [128, 58, 1077]
 GAME_OVER_TIMER = 70
 LEVEL_WON_TIMER = 50
 
@@ -317,8 +319,8 @@ class MyGame(arcade.Window):
         self.locks = []
 
         if CHEATS.get('keyLocks'):
-            self.keys = [key_lock for key_lock in KEY_LOCK_COLOURS]
-            self.locks = [key_lock for key_lock in KEY_LOCK_COLOURS]
+            self.keys = [key_lock for key_lock in KEY_LOCK_COLOURS[level - 1]]
+            self.locks = [key_lock for key_lock in KEY_LOCK_COLOURS[level - 1]]
 
         # Set up the player, specifically placing it at these coordinates.
         self.player_sprite = PlayerCharacter()
@@ -348,7 +350,7 @@ class MyGame(arcade.Window):
         short_green_worms = self.get_layer(LAYER_NAME_SHORT_GREEN_WORMS)
         if short_green_worms:
             barrier_sprites.extend(short_green_worms)
-        for colour in KEY_LOCK_COLOURS:
+        for colour in KEY_LOCK_COLOURS[level - 1]:
             barrier_sprites.extend(self.get_layer(f"{colour}Lock"))
 
         moving_platforms = self.get_layer(LAYER_NAME_MOVING_PLATFORMS)
@@ -527,7 +529,7 @@ class MyGame(arcade.Window):
 
         self.process_coins()
 
-        for key_lock in KEY_LOCK_COLOURS:
+        for key_lock in KEY_LOCK_COLOURS[self.level - 1]:
             self.process_keys_and_locks(key_lock)
 
         self.process_springs()
@@ -588,7 +590,7 @@ class MyGame(arcade.Window):
             self.locks.append(colour)
             lock.remove_from_sprite_lists()
             # If we've unlocked all the locks...
-            if len(self.locks) >= len(KEY_LOCK_COLOURS):
+            if len(self.locks) >= len(KEY_LOCK_COLOURS[self.level - 1]):
                 # ... unlock all the doors
                 door_sprite_list: SpriteList = self.get_layer(LAYER_NAME_LOCKED_DOORS)
                 if door_sprite_list:

@@ -9,6 +9,7 @@
         ".",
         "Levels"
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "Background.tsx": {
             "dynamicWrapping": true,
@@ -61,26 +62,31 @@
             "scaleInDock": 1
         },
         "Levels/level01.tmx": {
-            "scale": 0.24292857142857144,
+            "scale": 0.33,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1049.691267274331,
-                "y": 1745.369009114966
+                "x": 927.2727272727271,
+                "y": 1024.242424242424
             }
         },
         "Levels/level02.tmx": {
-            "expandedObjectLayers": [
-                27
-            ],
-            "scale": 0.25,
-            "selectedLayer": 6,
+            "scale": 0.125,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 664,
-                "y": 2014
+                "x": 2040,
+                "y": 1464
             }
         },
         "Levels/level02.tmx#Background": {
             "scaleInDock": 1
+        },
+        "Levels/level03.tmx": {
+            "scale": 0.25,
+            "selectedLayer": 24,
+            "viewCenter": {
+                "x": 1880,
+                "y": 5340
+            }
         },
         "TileSets/Background.tsx": {
             "dynamicWrapping": true,
@@ -145,18 +151,24 @@
     },
     "last.externalTilesetPath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/ClimbToTheTop/TiledMap/TileSets",
     "last.imagePath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/ClimbToTheTop/TiledMap/TileSets/Tiles/platformer-extendedtiles-0/PNG Grass/Spritesheet",
-    "map.height": 70,
+    "last.worldFilePath": "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/ClimbToTheTop/TiledMap/Levels",
+    "loadedWorlds": [
+        "C:/Users/Colin Dart/PycharmProjects/python-arcade/Platformer/ClimbToTheTop/TiledMap/Levels/level03.tmx"
+    ],
+    "map.fixedSize": true,
+    "map.height": 110,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 70,
     "map.tileWidth": 70,
-    "map.width": 45,
+    "map.width": 180,
     "openFiles": [
         "Levels/level01.tmx"
     ],
     "project": "ClimbToTheTop.tiled-project",
     "recentFiles": [
-        "Levels/level01.tmx",
+        "Levels/level03.tmx",
         "Levels/level02.tmx",
+        "Levels/level01.tmx",
         "level01.tmx",
         "level02.tmx",
         "level2.tmx",
