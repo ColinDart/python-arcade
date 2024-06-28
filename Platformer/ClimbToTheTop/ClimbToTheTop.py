@@ -691,7 +691,9 @@ class MyGame(arcade.Window):
 
     def activate_springs(self, colour):
         sprites: SpriteList = self.get_layer(f"{colour}Springs")
-        for inactive_spring in sprites.sprite_list:
+        # create a copy of the sprites to iterate through, so we're not mutating the list we're iterating through
+        spring_sprites = [sprite for sprite in sprites.sprite_list]
+        for inactive_spring in spring_sprites:
             # Replace the inactive spring with an active one
             inactive_spring.remove_from_sprite_lists()
 
