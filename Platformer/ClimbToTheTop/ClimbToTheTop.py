@@ -27,7 +27,7 @@ LAYER_NAME_PLATFORMS = "Platforms"
 
 SPIKES_LAYERS = [LAYER_NAME_YELLOW_SPIKES, LAYER_NAME_SPIKES]
 
-CHEATS = {'startLevel': 3,
+CHEATS = {'startLevel': 1,
           'restart': 'level',
           'keyLocks': False,
           'startX': 0,
