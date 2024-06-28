@@ -22,7 +22,10 @@ LAYER_NAME_MOVING_PLATFORMS = "MovingPlatforms"
 LAYER_NAME_COINS = "Coins"
 LAYER_NAME_CHAINS = "Chains"
 LAYER_NAME_YELLOW_SPIKES = "YellowSpikes"
+LAYER_NAME_SPIKES = "Spikes"
 LAYER_NAME_PLATFORMS = "Platforms"
+
+SPIKES_LAYERS = [LAYER_NAME_YELLOW_SPIKES, LAYER_NAME_SPIKES]
 
 CHEATS = {'startLevel': 3,
           'restart': 'level',
@@ -296,6 +299,9 @@ class MyGame(arcade.Window):
                 "use_spatial_hash": True,
             },
             LAYER_NAME_YELLOW_SPIKES: {
+                "use_spatial_hash": True,
+            },
+            LAYER_NAME_SPIKES: {
                 "use_spatial_hash": True,
             },
             LAYER_NAME_MOVING_PLATFORMS: {
@@ -644,15 +650,16 @@ class MyGame(arcade.Window):
 
     def process_spikes(self):
         # See if we hit any spikes
-        yellow_spikes_layer = self.get_layer(LAYER_NAME_YELLOW_SPIKES)
-        if not yellow_spikes_layer:
-            return
+        for layer_name in SPIKES_LAYERS:
+            spikes_layer = self.get_layer(layer_name)
+            if not spikes_layer:
+                continue
 
-        hit_list = arcade.check_for_collision_with_list(
-            self.player_sprite, yellow_spikes_layer
-        )
-        if len(hit_list) > 0:
-            self.set_game_over()
+            hit_list = arcade.check_for_collision_with_list(
+                self.player_sprite, spikes_layer
+            )
+            if len(hit_list) > 0:
+                self.set_game_over()
 
     def process_buttons(self):
         # See if we hit any buttons

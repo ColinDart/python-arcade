@@ -71,7 +71,7 @@
         },
         "Levels/level02.tmx": {
             "scale": 0.125,
-            "selectedLayer": 3,
+            "selectedLayer": 10,
             "viewCenter": {
                 "x": 2040,
                 "y": 1464
@@ -84,8 +84,8 @@
             "scale": 0.25,
             "selectedLayer": 24,
             "viewCenter": {
-                "x": 1880,
-                "y": 5340
+                "x": 1780,
+                "y": 5384
             }
         },
         "TileSets/Background.tsx": {
